@@ -17,7 +17,7 @@
 #define IS_VALID(pos, val)	((((1 << pos) >> 1) & val) != 0)
 #define SET(pos, val) 		val = val | ((1 << pos) >> 1)
 #define CLEAR(pos, val)		val = val & (~((1 << pos) >> 1))
-
+#define GET_POS(x, y)           (x * 9 + y)
 
 using namespace std;
 
@@ -68,7 +68,7 @@ int evil_puzzle[][9] = {
     {8, 0, 4, 0, 0, 0, 7, 0, 0},
     {0, 0, 0, 0, 4, 8, 0, 2, 0}
 };
-
+/*
 int test_puzzle[][9] = {
     {0, 0, 0, 0, 0, 0, 0, 0, 0},
     {0, 1, 0, 0, 0, 0, 0, 0, 0},
@@ -80,7 +80,7 @@ int test_puzzle[][9] = {
     {0, 0, 0, 0, 0, 0, 0, 0, 0},
     {0, 0, 0, 0, 0, 0, 0, 0, 0}
 };
-
+*/
 
 int (*puzzle)[9];
 list<int> assignment;
@@ -93,7 +93,8 @@ void print(int (*puzzle)[9])
     {
         for (int j = 0; j < 9; ++j)
         {
-            cout<<setw(9)<<hex<<puzzle[i][j]<<" ";
+//            cout<<setw(9)<<hex<<puzzle[i][j]<<" ";
+            cout<<puzzle[i][j]<<" ";
         }
         cout<<endl;
     }
@@ -417,6 +418,103 @@ void sortVarByH
 */
 }
 
+int calRuleOut
+(
+    const unsigned int (*table)[9],
+    int val,
+    int pos
+)
+{
+    int cntRuleOut = 0;
+    int x = pos / 9;
+    int y = pos % 9;
+
+    // Update Row
+    for (int j = 0; j < 9; ++j)
+    {
+        if (!IS_VALID(FIX_BIT, table[x][j]))
+        {
+            // Only check with remaining variables
+            if (j == y)
+            {
+                // Will not count itself
+                continue;
+            }
+            if (IS_VALID(val, table[x][j]))
+                ++cntRuleOut;
+        }
+    }
+
+    // Update Column
+    for (int i = 0; i < 9; ++i)
+    {
+        if (!IS_VALID(FIX_BIT, table[i][y]))
+        {
+            // Only check with remaining variables
+            if (i == x)
+            {
+                // Will not count itself
+                continue;
+            }
+            if (IS_VALID(val, table[i][y]))
+                ++cntRuleOut;
+        }
+    }
+
+    // Locate Subgrid (i, k)
+    int l = x / 3;
+    int k = y / 3;
+    // Update Subgrid
+    for (int i = 0; i < 3; ++i)
+    {
+        for (int j = 0; j < 3; ++j)
+        {
+            int m = 3 * l + i;
+            int n = 3 * k + j;
+            
+            if (!IS_VALID(FIX_BIT, table[m][n]))
+            {
+                // Only check with remaining variables
+                if (m == x || n == y)
+                {
+                    // Will not count itself & current row & current column
+                    continue;
+                }
+            if (IS_VALID(val, table[m][n]))
+                ++cntRuleOut;
+            }
+        }
+    }
+
+    return cntRuleOut;
+}
+
+
+void sortDomainByH
+(
+    const unsigned int (*table)[9],
+    const vector<int>* const pDomain,
+    int pos,
+    multimap<int, int>* pSortedDomain
+)
+{
+    int i = pos / 9;
+    int j = pos % 9;
+
+    for (int k = 0; k < 9; ++k)
+    {
+        int cntRuleOutVal;
+        int val = (*pDomain)[k];
+        if (!IS_VALID(val, table[i][j]))
+        {
+            // This value is not in the domain
+            continue; // Skip
+        }
+        cntRuleOutVal = calRuleOut(table, val, pos);
+        pSortedDomain->insert(make_pair(cntRuleOutVal, val));
+    }
+}
+
 void select(
     const vector<int>* const pVariable,
     int* pPos,
@@ -456,20 +554,28 @@ bool solve(
     // Init. multimap for most constrained / constraining variables 
     multimap<int, int> sortedVar;
     sortVarByH(pTable, pVariable, &sortedVar); 
-    // Select
+    // Select Variable
     pos = sortedVar.begin()->second;
     i = pos / 9;
     j = pos % 9;
     // Init. domain
-    for (int k = 0; k < 9; ++k)
+    multimap<int, int> sortedDomain;
+    sortDomainByH(table, pDomain, pos, &sortedDomain);
+/*
+    cout<<"Pos: "<<i<<", "<<j<<endl;
+    for (multimap<int, int>::iterator it = sortedDomain.begin();
+         it != sortedDomain.end();
+         ++it)
     {
-        if (!IS_VALID((*pDomain)[k], table[i][j]))
-        {
-            // This value is not in the domain
-            continue; // Skip
-        }
-
-        puzzle[i][j] = (*pDomain)[k];
+         cout<<"CntRuleOut: "<<it->first;
+         cout<<"\tVal: "<<it->second<<endl;
+    }
+*/
+    for (multimap<int, int>::iterator it = sortedDomain.begin();
+         it != sortedDomain.end();
+         ++it)
+    {
+        puzzle[i][j] = it->second;
         ++countNode;
         if (isLegal(puzzle))
         {
@@ -483,7 +589,7 @@ bool solve(
                 continue;
             }
 
-            assignment.push_back((*pDomain)[k]);
+            assignment.push_back(it->second);
             if (solve(table, pDomain, pVariable, puzzle))
             {
                 return true;
@@ -547,10 +653,10 @@ int main(int argc, char* argv[])
         }
     }
     initTable(table, puzzle);
-
+/*
     print(reinterpret_cast<int (*)[9]>(table));
     cout<<endl;
-
+*/
     // Solve + Print result
     assert(solve(table, &domain, &variable, puzzle));
     print(puzzle);
