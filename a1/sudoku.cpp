@@ -1,6 +1,12 @@
+#include <algorithm>
 #include <cassert>
 #include <iostream>
+#include <random>
 #include <list>
+#include <vector>
+
+#include <sys/types.h>
+#include <unistd.h>
 
 using namespace std;
 
@@ -54,6 +60,7 @@ int evil_puzzle[][9] = {
 
 int (*puzzle)[9];
 list<int> assignment;
+unsigned int seed;
 
 void print(int (*puzzle)[9])
 {
@@ -143,21 +150,49 @@ bool isLegal(int (*puzzle)[9])
     return true;
 }
 
-void select(int *pPos, int* pI, int* pJ, int (*puzzle)[9])
+void select(const vector<int>* const pVariable, int* pPos, int* pI, int* pJ)
 {
-    int new_pos = *pPos;
-    while (puzzle[new_pos / 9][new_pos % 9] != 0)
-    {
-        new_pos = (new_pos + 1) % 81;
-        assert(new_pos != *pPos);
-    }
+    int newPos;
 
-    *pI = new_pos / 9;
-    *pJ = new_pos % 9;
-    *pPos = new_pos;
+    assert(*pPos != pVariable->size());
+    newPos = (*pVariable)[*pPos];
+    *pI = newPos / 9;
+    *pJ = newPos % 9;
+    // Update iterator
+    ++(*pPos);
 }
 
-bool solve(int pos, int (*puzzle)[9])
+void initDomain(vector<int>* pDomain)
+{
+    pDomain->reserve(9);
+    // Init. Domain
+    for (int i = 1; i <= 9; ++i)
+    {
+        pDomain->push_back(i);
+    }
+    // Randomize Domain
+    shuffle(pDomain->begin(), pDomain->end(), std::default_random_engine(seed));
+}
+
+void initVariable(const int (*puzzle)[9], vector<int>* pVariable)
+{
+    pVariable->reserve(81);
+    // Init. Variable
+    for (int i = 0; i < 9; ++i)
+    {
+        for (int j = 0; j < 9; ++j)
+        {
+            if (puzzle[i][j] == 0)
+            {
+                pVariable->push_back(i * 9 + j);
+            }
+        }
+    }
+    // Randomize Variable
+    shuffle(pVariable->begin(), pVariable->end(), std::default_random_engine(seed));
+}
+
+bool solve(const vector<int>* const pDomain, const vector<int>* const pVariable, int pos, int (*puzzle)[9])
 {
     int i, j;
 
@@ -165,27 +200,20 @@ bool solve(int pos, int (*puzzle)[9])
     if (isComplete(puzzle))
         return true;
 
-    select(&pos, &i, &j, puzzle);
-    for (int k = 1; k <= 9; ++k)
+    select(pVariable, &pos, &i, &j);
+    // Init. domain
+    for (int k = 0; k < 9; ++k)
     {
-        puzzle[i][j] = k;
-#ifdef DBG
-cout<<"Try ("<<i<<", "<<j<<") = "<<k<<endl;
-if (i == 0 && j == 0 && k == 4)
-{
-    print(puzzle);
-    assert(0);
-}
-#endif
+        puzzle[i][j] = (*pDomain)[k];
         if (isLegal(puzzle))
         {
-            assignment.push_back(k);
-            if (solve(pos, puzzle))
+            // assignment.push_back((*pDomain)[k]);
+            if (solve(pDomain, pVariable, pos, puzzle))
             {
                 return true;
             }
             // Failed - backtrack
-            assignment.pop_back();
+            // assignment.pop_back();
             puzzle[i][j] = 0;
         }
     }
@@ -196,12 +224,20 @@ if (i == 0 && j == 0 && k == 4)
 
 int main(int argc, char* argv[])
 {
-    puzzle = eazy_puzzle;
-    puzzle = medium_puzzle;
+//    puzzle = eazy_puzzle;
+//    puzzle = medium_puzzle;
     puzzle = hard_puzzle;
-    puzzle = evil_puzzle;
+//    puzzle = evil_puzzle;
 
-    assert(solve(0, puzzle));
+    // Initialize
+    seed = (unsigned int)getpid();
+    vector<int> variable, domain;
+    initVariable(puzzle, &variable);
+    initDomain(&domain);
+    vector<int>::iterator endIt = variable.end();
+
+    // Solve + Print result
+    assert(solve(&domain, &variable, 0, puzzle));
     print(puzzle);
 
     return 0;
