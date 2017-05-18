@@ -12,6 +12,7 @@
 #include <unistd.h>
 
 #define FIX_BIT			31
+#define MOST_CONSTRAINING_MAX   0x1b // 9 + 9 + 9 is overestimated, but it is ok
 
 #define IS_VALID(pos, val)	((((1 << pos) >> 1) & val) != 0)
 #define SET(pos, val) 		val = val | ((1 << pos) >> 1)
@@ -174,23 +175,6 @@ bool isLegal(int (*puzzle)[9])
     return true;
 }
 
-void select(
-    const vector<int>* const pVariable,
-    int* pPos,
-    int* pI,
-    int* pJ
-)
-{
-    int newPos;
-
-    assert(*pPos != pVariable->size());
-    newPos = (*pVariable)[*pPos];
-    *pI = newPos / 9;
-    *pJ = newPos % 9;
-    // Update iterator
-    ++(*pPos);
-}
-
 void initDomain(vector<int>* pDomain)
 {
     pDomain->reserve(9);
@@ -324,19 +308,86 @@ void initTable
     }
 }
 
-void sortVarByH
+int countConstrainingVar
 (
-    const unsigned int (*pTable)[9], // Table in previous state
-    const vector<int>* const pVariable,
-    list<int>* pSortVariable
+    const unsigned int (*table)[9],
+    int pos
 )
 {
-    multimap<int, int> mostConstrainedVar;
+    int cntVar = 0;
+    int x = pos / 9;
+    int y = pos % 9;
+
+    // Update Row
+    for (int j = 0; j < 9; ++j)
+    {
+        if (!IS_VALID(FIX_BIT, table[x][j]))
+        {
+            // Only check with remaining variables
+            if (j == y)
+            {
+                // Will not count itself
+                continue;
+            }
+            ++cntVar;
+        }
+    }
+
+    // Update Column
+    for (int i = 0; i < 9; ++i)
+    {
+        if (!IS_VALID(FIX_BIT, table[i][y]))
+        {
+            // Only check with remaining variables
+            if (i == x)
+            {
+                // Will not count itself
+                continue;
+            }
+            ++cntVar;
+        }
+    }
+
+    // Locate Subgrid (i, k)
+    int l = x / 3;
+    int k = y / 3;
+    // Update Subgrid
+    for (int i = 0; i < 3; ++i)
+    {
+        for (int j = 0; j < 3; ++j)
+        {
+            int m = 3 * l + i;
+            int n = 3 * k + j;
+            
+            if (!IS_VALID(FIX_BIT, table[m][n]))
+            {
+                // Only check with remaining variables
+                if (m == x || n == y)
+                {
+                    // Will not count itself & current row & current column
+                    continue;
+                }
+                ++cntVar;
+            }
+        }
+    }
+
+    return cntVar;
+}
+
+void sortVarByH
+(
+    const unsigned int (*table)[9],
+    const vector<int>* const pVariable,
+    multimap<int, int>* pSortedVar
+)
+{
     for (int i = 0; i < pVariable->size(); ++i)
     {
         int pos = (*pVariable)[i];
-        int allBits = pTable[pos / 9][pos % 9];
+        int allBits = table[pos / 9][pos % 9];
         int cntBit = 0;
+        int cntConstraining = 0;
         // If this variable is fix (set), skip
         if (IS_VALID(FIX_BIT, allBits))
             continue;
@@ -348,29 +399,52 @@ void sortVarByH
             if (r != 0)
                 ++cntBit;
         }
-        mostConstrainedVar.insert(make_pair(cntBit, pos));
+        cntConstraining = countConstrainingVar(table, pos);
+        pSortedVar->insert(make_pair(
+                                  //cntConstraining,
+                                  (MOST_CONSTRAINING_MAX - cntConstraining) | (cntBit << 16),
+                                  pos)
+                                 );
     }
-
-    for (map<int, int>::iterator it = mostConstrainedVar.begin();
-         it != mostConstrainedVar.end(); ++it)
+/*
+    for (map<int, int>::iterator it = pSortedVar->begin();
+         it != pSortedVar->end(); ++it)
     {
         cout<<"Pos: "<<it->second / 9<<", "<<it->second % 9;
         cout<<"\tCnt: "<<it->first<<endl;
     }
     cout<<endl;
+*/
 }
+
+void select(
+    const vector<int>* const pVariable,
+    int* pPos,
+    int* pI,
+    int* pJ
+)
+{
+    int newPos;
+
+    assert(*pPos != pVariable->size());
+    newPos = (*pVariable)[*pPos];
+    *pI = newPos / 9;
+    *pJ = newPos % 9;
+    // Update iterator
+    ++(*pPos);
+}
+
 
 
 bool solve(
     const unsigned int (*pTable)[9], // Table in previous state
     const vector<int>* const pDomain,
     const vector<int>* const pVariable,
-    int pos,
     int (*puzzle)[9]
 )
 {
     unsigned int table[9][9]; // Table for forward checking
-    int i, j;
+    int pos, i, j;
 
     // Base case
     if (isComplete(puzzle))
@@ -379,7 +453,13 @@ bool solve(
 
     // Init. table for forward checking
     memcpy(table, pTable, 4 * 9 * 9);
-    select(pVariable, &pos, &i, &j);
+    // Init. multimap for most constrained / constraining variables 
+    multimap<int, int> sortedVar;
+    sortVarByH(pTable, pVariable, &sortedVar); 
+    // Select
+    pos = sortedVar.begin()->second;
+    i = pos / 9;
+    j = pos % 9;
     // Init. domain
     for (int k = 0; k < 9; ++k)
     {
@@ -404,7 +484,7 @@ bool solve(
             }
 
             assignment.push_back((*pDomain)[k]);
-            if (solve(table, pDomain, pVariable, pos, puzzle))
+            if (solve(table, pDomain, pVariable, puzzle))
             {
                 return true;
             }
@@ -471,11 +551,8 @@ int main(int argc, char* argv[])
     print(reinterpret_cast<int (*)[9]>(table));
     cout<<endl;
 
-    list<int> sortVariable;
-    sortVarByH(table, &variable, &sortVariable);
-
     // Solve + Print result
-    assert(solve(table, &domain, &variable, 0, puzzle));
+    assert(solve(table, &domain, &variable, puzzle));
     print(puzzle);
     cout<<"count: "<<countNode<<endl;
     return 0;

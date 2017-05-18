@@ -61,7 +61,7 @@ int evil_puzzle[][9] = {
 int (*puzzle)[9];
 list<int> assignment;
 unsigned int seed;
-unsigned int countNode = 0;
+unsigned long long countNode = 0;
 
 void print(int (*puzzle)[9])
 {
@@ -206,7 +206,7 @@ bool solve(const vector<int>* const pDomain, const vector<int>* const pVariable,
     for (int k = 0; k < 9; ++k)
     {
         puzzle[i][j] = (*pDomain)[k];
-        ++countNode;
+        countNode = countNode + 1ull;
         if (isLegal(puzzle))
         {
             assignment.push_back((*pDomain)[k]);
