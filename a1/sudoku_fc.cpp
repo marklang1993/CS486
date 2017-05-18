@@ -1,12 +1,19 @@
 #include <algorithm>
 #include <cassert>
+#include <cstring>
 #include <iostream>
+#include <iomanip>
 #include <random>
 #include <list>
 #include <vector>
 
 #include <sys/types.h>
 #include <unistd.h>
+
+
+#define IS_VALID(pos, val)	((((1 << pos) >> 1) & val) != 0)
+#define SET(pos, val) 		val = val | ((1 << pos) >> 1)
+#define CLEAR(pos, val)		val = val & (~((1 << pos) >> 1))
 
 using namespace std;
 
@@ -57,6 +64,19 @@ int evil_puzzle[][9] = {
     {8, 0, 4, 0, 0, 0, 7, 0, 0},
     {0, 0, 0, 0, 4, 8, 0, 2, 0}
 };
+
+int test_puzzle[][9] = {
+    {0, 0, 0, 0, 0, 0, 0, 0, 0},
+    {0, 1, 0, 0, 0, 0, 0, 0, 0},
+    {0, 2, 0, 0, 0, 0, 0, 0, 0},
+    {0, 0, 0, 0, 0, 0, 0, 0, 0},
+    {0, 0, 0, 0, 0, 0, 0, 0, 0},
+    {0, 0, 0, 0, 0, 0, 0, 0, 0},
+    {0, 0, 0, 0, 0, 0, 0, 0, 0},
+    {0, 0, 0, 0, 0, 0, 0, 0, 0},
+    {0, 0, 0, 0, 0, 0, 0, 0, 0}
+};
+
 
 int (*puzzle)[9];
 list<int> assignment;
@@ -151,7 +171,12 @@ bool isLegal(int (*puzzle)[9])
     return true;
 }
 
-void select(const vector<int>* const pVariable, int* pPos, int* pI, int* pJ)
+void select(
+    const vector<int>* const pVariable,
+    int* pPos,
+    int* pI,
+    int* pJ
+)
 {
     int newPos;
 
@@ -193,30 +218,157 @@ void initVariable(const int (*puzzle)[9], vector<int>* pVariable)
     shuffle(pVariable->begin(), pVariable->end(), std::default_random_engine(seed));
 }
 
-bool solve(const vector<int>* const pDomain, const vector<int>* const pVariable, int pos, int (*puzzle)[9])
+void updateTable
+(
+    unsigned int (*table)[9],
+    const int val,
+    const int x,
+    const int y
+)
 {
+//cout<<endl;
+//print(reinterpret_cast<int (*)[9]>(table));
+     
+    // Update Row
+    for (int j = 0; j < 9; ++j)
+    {
+        if (j != y)
+        {
+            CLEAR(val, table[x][j]);
+        }
+        else
+        {
+            table[x][j] = 0;
+            SET(val, table[x][j]);
+        }
+
+    }
+//cout<<endl;
+//print(reinterpret_cast<int (*)[9]>(table));
+
+    // Update Column
+    for (int i = 0; i < 9; ++i)
+    {
+        if (i != x)
+        {
+	    CLEAR(val, table[i][y]);
+        }
+        else
+        {
+            table[i][y] = 0;
+            SET(val, table[i][y]);
+        }
+    }
+//cout<<endl;
+//print(reinterpret_cast<int (*)[9]>(table));
+
+    // Locate Subgrid (i, k)
+    int l = x / 3;
+    int k = y / 3;
+    // Update Subgrid
+    for (int i = 0; i < 3; ++i)
+    {
+        for (int j = 0; j < 3; ++j)
+        {
+            int m = 3 * l + i;
+            int n = 3 * k + j;
+            if (m != x || n != y)
+            {
+	        CLEAR(val, table[m][n]);
+            }
+            else
+            {
+                table[m][n] = 0;
+                SET(val, table[m][n]);
+            }
+        }
+    }
+//cout<<endl;
+//print(reinterpret_cast<int (*)[9]>(table));
+}
+
+bool checkTable(const unsigned int (*table)[9])
+{
+    for (int i = 0; i < 9; ++i)
+    {
+        for (int j = 0; j < 9; ++j)
+        {
+            if (table[i][j] == 0)
+                return false;
+        }
+    }
+    return true;
+}
+
+void initTable
+(
+    unsigned int (*table)[9],
+    const int (*puzzle)[9] 
+)
+{
+    for (int i = 0; i < 9; ++i)
+    {
+        for (int j = 0; j < 9; ++j)
+        {
+            if (puzzle[i][j] != 0)
+            {
+                updateTable(table, puzzle[i][j], i, j);
+            }
+        }
+    }
+}
+
+bool solve(
+    const unsigned int (*pTable)[9], // Table in previous state
+    const vector<int>* const pDomain,
+    const vector<int>* const pVariable,
+    int pos,
+    int (*puzzle)[9]
+)
+{
+    unsigned int table[9][9]; // Table for forward checking
     int i, j;
 
     // Base case
     if (isComplete(puzzle))
         return true;
 
+
+    // Init. table for forward checking
+    memcpy(table, pTable, 4 * 9 * 9);
     select(pVariable, &pos, &i, &j);
     // Init. domain
     for (int k = 0; k < 9; ++k)
     {
+        if (!IS_VALID((*pDomain)[k], table[i][j]))
+        {
+            // This value is not in the domain
+            continue; // Skip
+        }
+
         puzzle[i][j] = (*pDomain)[k];
         ++countNode;
         if (isLegal(puzzle))
         {
+            // Forward checking
+            updateTable(table, puzzle[i][j], i, j);
+            if (!checkTable(table))
+            {
+                // Failed - backtrack
+                puzzle[i][j] = 0;
+                memcpy(table, pTable, 4 * 9 * 9);
+                continue;
+            }
+
             assignment.push_back((*pDomain)[k]);
-            if (solve(pDomain, pVariable, pos, puzzle))
+            if (solve(table, pDomain, pVariable, pos, puzzle))
             {
                 return true;
             }
             // Failed - backtrack
             assignment.pop_back();
             puzzle[i][j] = 0;
+            memcpy(table, pTable, 4 * 9 * 9);
         }
     }
     // Tried all values in domain for this variable
@@ -250,6 +402,10 @@ int main(int argc, char* argv[])
             break;
 
         default:
+/*
+            puzzle = test_puzzle;
+            break;
+*/
             assert(0);
     }
 
@@ -259,9 +415,30 @@ int main(int argc, char* argv[])
     initVariable(puzzle, &variable);
     initDomain(&domain);
     vector<int>::iterator endIt = variable.end();
+    unsigned int table[9][9];
+    for (int i = 0; i < 9; ++i)
+    {
+        for (int j = 0; j < 9; ++j)
+        {
+            table[i][j] = 0x1ff;
+        }
+    }
+    initTable(table, puzzle);
+/*
+    print(reinterpret_cast<int (*)[9]>(table));
+    cout<<endl;
+    puzzle[0][1] = 3;
+    updateTable(table, 3, 0, 1);
+    print(reinterpret_cast<int (*)[9]>(table));
+    cout<<endl;
+    puzzle[8][8] = 3;
+    updateTable(table, 3, 8, 8);
+    print(reinterpret_cast<int (*)[9]>(table));
+*/    
+
 
     // Solve + Print result
-    assert(solve(&domain, &variable, 0, puzzle));
+    assert(solve(table, &domain, &variable, 0, puzzle));
     print(puzzle);
     cout<<"count: "<<countNode<<endl;
     return 0;
