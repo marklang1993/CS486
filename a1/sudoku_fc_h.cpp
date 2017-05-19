@@ -8,6 +8,7 @@
 #include <vector>
 #include <map>
 
+#include <time.h>
 #include <sys/types.h>
 #include <unistd.h>
 
@@ -489,7 +490,6 @@ int calRuleOut
     return cntRuleOut;
 }
 
-
 void sortDomainByH
 (
     const unsigned int (*table)[9],
@@ -532,8 +532,6 @@ void select(
     ++(*pPos);
 }
 
-
-
 bool solve(
     const unsigned int (*pTable)[9], // Table in previous state
     const vector<int>* const pDomain,
@@ -547,7 +545,6 @@ bool solve(
     // Base case
     if (isComplete(puzzle))
         return true;
-
 
     // Init. table for forward checking
     memcpy(table, pTable, 4 * 9 * 9);
@@ -658,8 +655,13 @@ int main(int argc, char* argv[])
     cout<<endl;
 */
     // Solve + Print result
+    clock_t startTime = clock();
     assert(solve(table, &domain, &variable, puzzle));
+    clock_t endTime = clock();
+    double interval = endTime - startTime;
+    interval = interval / (double)CLOCKS_PER_SEC;
     print(puzzle);
     cout<<"count: "<<countNode<<endl;
+    cout<<"time: "<<interval<<" s"<<endl;
     return 0;
 }
