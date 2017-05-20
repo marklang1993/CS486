@@ -69,19 +69,6 @@ int evil_puzzle[][9] = {
     {8, 0, 4, 0, 0, 0, 7, 0, 0},
     {0, 0, 0, 0, 4, 8, 0, 2, 0}
 };
-/*
-int test_puzzle[][9] = {
-    {0, 0, 0, 0, 0, 0, 0, 0, 0},
-    {0, 1, 0, 0, 0, 0, 0, 0, 0},
-    {0, 2, 0, 0, 0, 0, 0, 0, 0},
-    {0, 0, 0, 0, 0, 0, 0, 0, 0},
-    {0, 0, 0, 0, 0, 0, 0, 0, 0},
-    {0, 0, 0, 0, 0, 0, 0, 0, 0},
-    {0, 0, 0, 0, 0, 0, 0, 0, 0},
-    {0, 0, 0, 0, 0, 0, 0, 0, 0},
-    {0, 0, 0, 0, 0, 0, 0, 0, 0}
-};
-*/
 
 int (*puzzle)[9];
 list<int> assignment;
@@ -602,8 +589,20 @@ bool solve(
     return false;
 }
 
+inline void errHandler(char* argv[])
+{
+    cerr<<"Usage: "<<argv[0]<<" Difficulty"<<endl;
+    cerr<<"Difficulty: 0 - Easy, 1 - Medium, 2 - Hard, 3 - Evil"<<endl;
+}
+
 int main(int argc, char* argv[])
 {
+    if (argc != 2)
+    {
+        errHandler(argv);
+        return 1;
+    }
+
     int index = atoi(argv[1]);
     switch(index)
     {
@@ -628,11 +627,8 @@ int main(int argc, char* argv[])
             break;
 
         default:
-/*
-            puzzle = test_puzzle;
-            break;
-*/
-            assert(0);
+            errHandler(argv);
+            return 1;
     }
 
     // Initialize

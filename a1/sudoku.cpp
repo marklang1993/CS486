@@ -224,8 +224,20 @@ bool solve(const vector<int>* const pDomain, const vector<int>* const pVariable,
     return false;
 }
 
+inline void errHandler(char* argv[])
+{
+    cerr<<"Usage: "<<argv[0]<<" Difficulty"<<endl;
+    cerr<<"Difficulty: 0 - Easy, 1 - Medium, 2 - Hard, 3 - Evil"<<endl;
+}
+
 int main(int argc, char* argv[])
 {
+    if (argc != 2)
+    {
+        errHandler(argv);
+        return 1;
+    }
+
     int index = atoi(argv[1]);
     switch(index)
     {
@@ -250,7 +262,8 @@ int main(int argc, char* argv[])
             break;
 
         default:
-            assert(0);
+            errHandler(argv);
+            return 1;
     }
 
     // Initialize
