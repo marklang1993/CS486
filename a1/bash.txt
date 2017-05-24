@@ -1,0 +1,10 @@
+for i in `seq 1 50`; do { time ./sudoku_fc_h 0; } >>output.txt; done
+
+for i in `seq 1 1`; do { time ./sudoku 2; } >>node_21.txt 2>> time_21.txt; done
+
+
+cat time_11.txt time_12.txt time_13.txt time_14.txt time_15.txt | grep "user" > medium.txt
+cat time_21.txt time_22.txt time_23.txt time_24.txt time_25.txt | grep "user" > hard.txt
+cat node_11.txt node_12.txt node_13.txt node_14.txt node_15.txt | grep "count" > medium_node.txt
+cat node_21.txt node_22.txt node_23.txt node_24.txt node_25.txt | grep "count" > hard_node.txt
+
