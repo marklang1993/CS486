@@ -6,9 +6,6 @@ class Factor(object):
     # self.idInfo : dict of vars and vals
     # self.pTable : probability table
 
-    def __init__(self):
-        pass
-
     # vars: list of variables
     # vals: 2d list of values of variables
     # p: 2d list of probability of values
@@ -65,33 +62,38 @@ class Factor(object):
 
     @staticmethod
     def restrict(f, variable, value):
+        # Create new factor object & copy
+        fN = Factor([],[],[])
+        fN.vars = list(f.vars)
+        fN.idInfo = dict(f.idInfo)
+        fN.pTable = f.pTable.copy()
+
         # Find index of variable
-        idxVar = f.vars.index(variable)
+        idxVar = fN.vars.index(variable)
         # Construct sliceObjTuple
         sliceObjTuple = ()
         for i in xrange(0, idxVar):
-            vals = f.idInfo[f.vars[i]]
+            vals = fN.idInfo[fN.vars[i]]
             sliceObjTuple += slice(None),
         # Process target variable's value
-        vals = f.idInfo[f.vars[idxVar]]
+        vals = fN.idInfo[fN.vars[idxVar]]
         idxVal = vals.index(value)
         sliceObjTuple += slice(idxVal, idxVal + 1),
-
         # 1. Slice vars
-        var = f.vars[idxVar]
-        del f.vars[idxVar]
-
+        var = fN.vars[idxVar]
+        del fN.vars[idxVar]
         # 2. Slice vals
-        del f.idInfo[var]
-
+        del fN.idInfo[var]
         # 3. Slice pTable
-        f.pTable = f.pTable[sliceObjTuple]
+        fN.pTable = fN.pTable[sliceObjTuple]
         rankTable = ()
-        for i in xrange(0, len(f.vars)):
-            vals = f.idInfo[f.vars[i]]
+        for i in xrange(0, len(fN.vars)):
+            vals = fN.idInfo[fN.vars[i]]
             curTuple = (len(vals),)
             rankTable = rankTable + curTuple         
-        f.pTable = f.pTable.reshape(rankTable)
+        fN.pTable = fN.pTable.reshape(rankTable)
+
+        return fN
 
     @staticmethod
     def multiply(fl, fr):
@@ -136,3 +138,37 @@ class Factor(object):
         fN.pTable = pTableL * pTableR
 
         return fN
+
+    @staticmethod
+    def sumout(f, variable):
+        # Create new factor object & copy
+        fN = Factor([],[],[])
+        fN.vars = list(f.vars)
+        fN.idInfo = dict(f.idInfo)
+        fN.pTable = f.pTable.copy()
+
+        # Get var index & update variables list
+        varIdx = fN.vars.index(variable)
+        del fN.vars[varIdx]
+        # Update idInfo
+        del fN.idInfo[variable]
+        # Update pTable
+        fN.pTable = fN.pTable.sum(axis = varIdx)
+
+        return fN
+    
+    @staticmethod
+    def normalize(f):
+        # Create new factor object & copy
+        fN = Factor([],[],[])
+        fN.vars = list(f.vars)
+        fN.idInfo = dict(f.idInfo)
+        fN.pTable = f.pTable.copy()
+
+        sum = fN.pTable.sum()
+        fN.pTable = fN.pTable / sum
+
+        return fN
+    
+    # @staticmethod
+    # def inference(fList, ):
