@@ -60,14 +60,17 @@ class Factor(object):
         print(self.vars)
         self.out_prob_recurse(curTuple)
 
+    def copy(self):
+        fN = Factor([],[],[])
+        fN.vars = list(self.vars)
+        fN.idInfo = dict(self.idInfo)
+        fN.pTable = self.pTable.copy()
+        return fN
+
     @staticmethod
     def restrict(f, variable, value):
         # Create new factor object & copy
-        fN = Factor([],[],[])
-        fN.vars = list(f.vars)
-        fN.idInfo = dict(f.idInfo)
-        fN.pTable = f.pTable.copy()
-
+        fN = f.copy()
         # Find index of variable
         idxVar = fN.vars.index(variable)
         # Construct sliceObjTuple
@@ -99,7 +102,33 @@ class Factor(object):
     def multiply(fl, fr):
         # Check alignment
         if (fl.vars[-1] != fr.vars[0]):
-            raise NotAlignmentException
+            # Not alignment
+            commonVars = [var for var in fl.vars if var in fr.vars]
+            if (len(commonVars) == 0):
+                raise CommonVarNotAvailableException
+            commonVar = commonVars[0] # Get 1 common Variable
+            if (fl.vars[0] == commonVar and fr.vars[-1] == commonVar):
+                # swap fl and fr
+                fl, fr = fr, fl
+            else:
+                # Left factor is not aligned
+                if (fl.vars[-1] != commonVar):
+                    # Swap variable
+                    cVarIdx = fl.vars.index(commonVar)
+                    fl.vars[cVarIdx], fl.vars[-1] = fl.vars[-1], fl.vars[cVarIdx]
+                    # Swap probability
+                    fl.pTable = np.swapaxes(fl.pTable, cVarIdx, fl.pTable.ndim - 1)
+               # Right factor is not aligned
+                if (fr.vars[0] != commonVar):
+                    # Swap variable
+                    cVarIdx = fr.vars.index(commonVar)
+                    fr.vars[cVarIdx], fr.vars[0] = fr.vars[0], fr.vars[cVarIdx]
+                    # Swap probability
+                    fr.pTable = np.swapaxes(fr.pTable, cVarIdx, 0)
+        
+        # Check alignment
+        if (fl.vars[-1] != fr.vars[0]):
+            raise FatalError
 
         # Create new factor object
         fN = Factor([],[],[])
@@ -142,11 +171,7 @@ class Factor(object):
     @staticmethod
     def sumout(f, variable):
         # Create new factor object & copy
-        fN = Factor([],[],[])
-        fN.vars = list(f.vars)
-        fN.idInfo = dict(f.idInfo)
-        fN.pTable = f.pTable.copy()
-
+        fN = f.copy()
         # Get var index & update variables list
         varIdx = fN.vars.index(variable)
         del fN.vars[varIdx]
@@ -160,15 +185,29 @@ class Factor(object):
     @staticmethod
     def normalize(f):
         # Create new factor object & copy
-        fN = Factor([],[],[])
-        fN.vars = list(f.vars)
-        fN.idInfo = dict(f.idInfo)
-        fN.pTable = f.pTable.copy()
-
+        fN = f.copy()
+        # Normalize
         sum = fN.pTable.sum()
         fN.pTable = fN.pTable / sum
 
         return fN
     
-    # @staticmethod
-    # def inference(fList, ):
+    # fList: List of Factor objects
+    # queryVars: List of strings of Variable
+    # orderedHiddenVarsList: List of strings of Variable
+    # evidenceList: Dict of Variable : Value
+    @staticmethod
+    def inference(fList, queryVars, orderedHiddenVarsList, evidenceList):
+        # Restrict by evidence
+        fListN = list()
+        for e in evidenceList:
+            for factor in fList:
+                if (e in factor.vars):
+                    fListN.append(Factor.restrict(factor, i, evidenceList[e]))
+                else:
+                    fListN.append(factor)
+        fList = fListN # Update factor list
+        
+        # Elimination
+        for hV in orderedHiddenVarsList:
+            fListM = list() # list of factors needed to be multiplied
