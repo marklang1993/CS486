@@ -6,10 +6,16 @@ class Factor(object):
     # self.idInfo : dict of vars and vals
     # self.pTable : probability table
 
+    def __init__(self):
+        pass
+
     # vars: list of variables
     # vals: 2d list of values of variables
     # p: 2d list of probability of values
     def __init__(self, vars, vals, p):
+        if len(vars) == 0:
+            return
+
         # Set variables
         self.vars = vars
 
@@ -57,35 +63,76 @@ class Factor(object):
         print(self.vars)
         self.out_prob_recurse(curTuple)
 
-    def restrict(self, variable, value):
+    @staticmethod
+    def restrict(f, variable, value):
         # Find index of variable
-        idxVar = self.vars.index(variable)
+        idxVar = f.vars.index(variable)
         # Construct sliceObjTuple
         sliceObjTuple = ()
         for i in xrange(0, idxVar):
-            vals = self.idInfo[self.vars[i]]
-            sliceObjTuple += slice(0, len(vals)),
+            vals = f.idInfo[f.vars[i]]
+            sliceObjTuple += slice(None),
         # Process target variable's value
-        vals = self.idInfo[self.vars[idxVar]]
+        vals = f.idInfo[f.vars[idxVar]]
         idxVal = vals.index(value)
         sliceObjTuple += slice(idxVal, idxVal + 1),
 
         # 1. Slice vars
-        var = self.vars[idxVar]
-        del self.vars[idxVar]
+        var = f.vars[idxVar]
+        del f.vars[idxVar]
 
         # 2. Slice vals
-        del self.idInfo[var]
+        del f.idInfo[var]
 
         # 3. Slice pTable
-        self.pTable = self.pTable[sliceObjTuple]
+        f.pTable = f.pTable[sliceObjTuple]
         rankTable = ()
-        for i in xrange(0, len(self.vars)):
-            vals = self.idInfo[self.vars[i]]
+        for i in xrange(0, len(f.vars)):
+            vals = f.idInfo[f.vars[i]]
             curTuple = (len(vals),)
             rankTable = rankTable + curTuple         
-        self.pTable = self.pTable.reshape(rankTable)
+        f.pTable = f.pTable.reshape(rankTable)
 
+    @staticmethod
+    def multiply(fl, fr):
+        # Check alignment
+        if (fl.vars[-1] != fr.vars[0]):
+            raise NotAlignmentException
 
+        # Create new factor object
+        fN = Factor([],[],[])
 
+        # Creat new variables & values dict
+        varS = fl.vars[-1] # shared variable
+        idInfoN = dict() # new idInfo dict 
 
+        varsL = fl.vars[:len(fl.vars) - 1]
+        cntVarsL = len(varsL)
+        for var in varsL:
+            idInfoN[var] = fl.idInfo[var]
+        
+        idInfoN[varS] = fl.idInfo[varS]
+
+        varsR = fr.vars[1:len(fr.vars)]
+        cntVarsR = len(varsR)
+        for var in varsR:
+            idInfoN[var] = fr.idInfo[var]
+        # Update new Factor object
+        fN.vars = varsL + list(varS) + varsR
+        fN.idInfo = idInfoN
+
+        # Reshape fl
+        rankTable = fl.pTable.shape
+        for i in xrange(0, cntVarsR):
+            rankTable += (1,)
+        pTableL = fl.pTable.reshape(rankTable)
+        # Reshape fr
+        rankTable = ()
+        for i in xrange(0, cntVarsL):
+            rankTable += (1,)
+        rankTable += fr.pTable.shape
+        pTableR = fr.pTable.reshape(rankTable)
+        # Create new pTable
+        fN.pTable = pTableL * pTableR
+
+        return fN
