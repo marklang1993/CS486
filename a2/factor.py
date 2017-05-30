@@ -32,10 +32,6 @@ class Factor(object):
         # Reshape
         self.pTable = self.pTable.reshape(rankTable)
 
-    def out(self):
-        # Use for debugging
-        print(self.pTable)
-
     def out_prob_recurse(self, curTuple):
         # Print probability recursively
         lenCurTuple = len(curTuple)
@@ -54,7 +50,7 @@ class Factor(object):
                 nextTuple = (i, )
                 self.out_prob_recurse(curTuple + nextTuple)
 
-    def out_prob(self):
+    def print_table(self):
         # Use for printing probability
         curTuple = ()
         print(self.vars)
@@ -100,10 +96,13 @@ class Factor(object):
 
     @staticmethod
     def multiply(fl, fr):
+        # Calculate common variables
+        commonVars = [var for var in fl.vars if var in fr.vars]
+        if len(commonVars) != 1:
+            raise MoreThanOneCommonVarsException
         # Check alignment
         if (fl.vars[-1] != fr.vars[0]):
             # Not alignment
-            commonVars = [var for var in fl.vars if var in fr.vars]
             if (len(commonVars) == 0):
                 raise CommonVarNotAvailableException
             commonVar = commonVars[0] # Get 1 common Variable
@@ -125,10 +124,6 @@ class Factor(object):
                     fr.vars[cVarIdx], fr.vars[0] = fr.vars[0], fr.vars[cVarIdx]
                     # Swap probability
                     fr.pTable = np.swapaxes(fr.pTable, cVarIdx, 0)
-        
-        # Check alignment
-        if (fl.vars[-1] != fr.vars[0]):
-            raise FatalError
 
         # Create new factor object
         fN = Factor([],[],[])
@@ -193,7 +188,7 @@ class Factor(object):
         return fN
     
     # fList: List of Factor objects
-    # queryVars: List of strings of Variable
+    # queryVars: query Variables
     # orderedHiddenVarsList: List of strings of Variable
     # evidenceList: Dict of Variable : Value
     @staticmethod
@@ -206,8 +201,32 @@ class Factor(object):
                     fListN.append(Factor.restrict(factor, i, evidenceList[e]))
                 else:
                     fListN.append(factor)
-        fList = fListN # Update factor list
+            # Update factor list
+            fList = fListN
         
         # Elimination
         for hV in orderedHiddenVarsList:
             fListM = list() # list of factors needed to be multiplied
+            fListNM = list() # list of factors not needed to be multiplied
+            # Split
+            for factor in fList:
+                if (hV in factor.vars):
+                    fListM.append(factor)
+                else:
+                    fListNM.append(factor)
+            # Multiply all
+            fProduct = reduce(Factor.multiply, fListM)
+            # Summout
+            fSumout = Factor.sumout(fProduct, hV)
+            # Update factor list
+            fList = fListNM
+            fList.append(fSumout)
+
+        # The remaining factors only refer to query variable
+        # Take product & normalize
+        fProduct = reduce(Factor.multiply, fList)
+        fResult = Factor.normalize(fProduct)
+
+        return fResult
+
+            
