@@ -38,19 +38,19 @@ def ex2():
     f3 = Factor(['A', 'C'], \
     [['t', 'f'], ['t', 'f']], \
     [0.8, 0.2, 0.1, 0.9])
-    # f3.print_table()
 
-    f4 = Factor(['B', 'C', 'D'], \
+    f4 = Factor(['D', 'B', 'C'], \
     [['t', 'f'], ['t', 'f'], ['t', 'f']], \
     [0.95, 0.05, 0.9, 0.1, 0.8, 0.2, 0.0, 1.0])
-    # f4.print_table()
 
     f5 = Factor(['C', 'E'], \
     [['t', 'f'], ['t', 'f']], \
     [0.7, 0.3, 0.0, 1.0])
 
-    res = Factor.multiply(f3, f4)
-    res.print_table()
+    # res1 = Factor.multiply(f3, f5)
+    # res1.print_table()
+    # res2 = Factor.multiply(f5, res1)
+    # res2.print_table()
 
     # fRes = Factor.multiply(f1, f3)
     # fRes.print_table()
@@ -119,21 +119,24 @@ def q2b2():
     [['t', 'f']], \
     [0.8, 0.2])
 
-    # fL = [f1, f2, f3, f4, f5, f6]
-    # qL = ['Fraud']
-    # hL = ['Trav']
-    # eL = dict(FP = 't', IP = 'f', CRP = 't')
-    # f3 = Factor.inference(fL, qL, hL, eL)
-    fL = [f1, f2, f3]
+    # hL = ['Trav', 'FP', 'Fraud', 'IP', 'OC', 'CRP']
+
+    fL = [f1, f2, f3, f4, f5, f6]
     qL = ['Fraud']
-    hL = ['Trav']
-    eL = dict(FP = 't')
+    hL = ['Trav', 'OC']
+    eL = dict(FP = 't', IP = 'f', CRP = 't')
     f3 = Factor.inference(fL, qL, hL, eL)
     f3.print_table()
 
-def main():
-    ex2()
+    # fL = [f1, f2, f3, f4]
+    # qL = ['Fraud']
+    # hL = ['Trav', 'OC']
+    # eL = dict(FP = 't', IP = 'f')
+    # f3 = Factor.inference(fL, qL, hL, eL)
+    # f3.print_table()
 
+def main():
+    q2b2()
 
 
 main()

@@ -32,7 +32,7 @@ class Factor(object):
         # Reshape
         self.pTable = self.pTable.reshape(rankTable)
 
-    def out_prob_recurse(self, curTuple):
+    def print_table_recurse(self, curTuple):
         # Print probability recursively
         lenCurTuple = len(curTuple)
         if (len(self.vars) == lenCurTuple):
@@ -48,13 +48,13 @@ class Factor(object):
             vals = self.idInfo[self.vars[lenCurTuple]]
             for i in xrange(0, len(vals)):
                 nextTuple = (i, )
-                self.out_prob_recurse(curTuple + nextTuple)
+                self.print_table_recurse(curTuple + nextTuple)
 
     def print_table(self):
         # Use for printing probability
         curTuple = ()
         print(self.vars)
-        self.out_prob_recurse(curTuple)
+        self.print_table_recurse(curTuple)
 
     def copy(self):
         fN = Factor([],[],[])
@@ -63,6 +63,17 @@ class Factor(object):
         fN.pTable = self.pTable.copy()
         return fN
 
+    def sort_factor(self):
+       for i in xrange(0, len(self.vars) - 1):
+           for j in xrange(0, len(self.vars) - 1 - i):
+               if (self.vars[i] > self.vars[i + 1]):
+                   # swap variables
+                   tmp = self.vars[i]
+                   self.vars[i] = self.vars[i + 1]
+                   self.vars[i + 1] = tmp
+                   # swap axes
+                   self.pTable = np.swapaxes(self.pTable, i, i + 1)
+        
     @staticmethod
     def restrict(f, variable, value):
         # Create new factor object & copy
@@ -96,71 +107,61 @@ class Factor(object):
 
     @staticmethod
     def multiply(fl, fr):
+        # Sort each factor
+        fl.sort_factor()
+        fr.sort_factor()
         # Calculate common variables
-        commonVars = [var for var in fl.vars if var in fr.vars]
-        if len(commonVars) != 1:
-            raise MoreThanOneCommonVarsException
-        # Check alignment
-        if (fl.vars[-1] != fr.vars[0]):
-            # Not alignment
-            if (len(commonVars) == 0):
-                raise CommonVarNotAvailableException
-            commonVar = commonVars[0] # Get 1 common Variable
-            if (fl.vars[0] == commonVar and fr.vars[-1] == commonVar):
-                # swap fl and fr
-                fl, fr = fr, fl
-            else:
-                # Left factor is not aligned
-                if (fl.vars[-1] != commonVar):
-                    # Swap variable
-                    cVarIdx = fl.vars.index(commonVar)
-                    fl.vars[cVarIdx], fl.vars[-1] = fl.vars[-1], fl.vars[cVarIdx]
-                    # Swap probability
-                    fl.pTable = np.swapaxes(fl.pTable, cVarIdx, fl.pTable.ndim - 1)
-               # Right factor is not aligned
-                if (fr.vars[0] != commonVar):
-                    # Swap variable
-                    cVarIdx = fr.vars.index(commonVar)
-                    fr.vars[cVarIdx], fr.vars[0] = fr.vars[0], fr.vars[cVarIdx]
-                    # Swap probability
-                    fr.pTable = np.swapaxes(fr.pTable, cVarIdx, 0)
+        commonVars = list()
+        for var in fl.vars:
+            if var in fr.vars:
+                commonVars.append(var)
+        for var in fr.vars:
+            if var in fl.vars:
+                if not(var in commonVars):
+                    commonVars.append(var)
+        # Calculate union variables
+        unionVars = list(fl.vars)
+        for var in fr.vars:
+            if not (var in commonVars):
+                unionVars.append(var)
+        # Sort both lists
+        commonVars.sort()
+        unionVars.sort()
 
+        # Check each variable
+        flTuple = ()
+        frTuple = ()
+        # print unionVars
+        # print fl.vars
+        # print fr.vars
+        for var in unionVars:
+            if var in fl.vars:
+                flTuple += (len(fl.idInfo[var]), )
+            else:
+                flTuple += (1, )
+            if var in fr.vars:
+                frTuple += (len(fr.idInfo[var]), )
+            else:
+                frTuple += (1, )
+        # Reshape
+        pTableL = fl.pTable.reshape(flTuple)
+        pTableR = fr.pTable.reshape(frTuple)
+
+        # print pTableL.shape
+        # print pTableL
+        # print pTableR.shape
+        # print pTableR
         # Create new factor object
         fN = Factor([],[],[])
-
-        # Creat new variables & values dict
-        varS = fl.vars[-1] # shared variable
-        idInfoN = dict() # new idInfo dict 
-
-        varsL = fl.vars[:len(fl.vars) - 1]
-        cntVarsL = len(varsL)
-        for var in varsL:
-            idInfoN[var] = fl.idInfo[var]
-        
-        idInfoN[varS] = fl.idInfo[varS]
-
-        varsR = fr.vars[1:len(fr.vars)]
-        cntVarsR = len(varsR)
-        for var in varsR:
-            idInfoN[var] = fr.idInfo[var]
-        # Update new Factor object
-        fN.vars = varsL + [varS] + varsR
-        fN.idInfo = idInfoN
-
-        # Reshape fl
-        rankTable = fl.pTable.shape
-        for i in xrange(0, cntVarsR):
-            rankTable += (1,)
-        pTableL = fl.pTable.reshape(rankTable)
-        # Reshape fr
-        rankTable = ()
-        for i in xrange(0, cntVarsL):
-            rankTable += (1,)
-        rankTable += fr.pTable.shape
-        pTableR = fr.pTable.reshape(rankTable)
-        # Create new pTable
         fN.pTable = pTableL * pTableR
-
+        fN.vars = unionVars
+        fN.idInfo = dict()
+        for var in unionVars:
+            if var in fl.idInfo:
+                fN.idInfo[var] = list(fl.idInfo[var])
+            if var in fr.idInfo:
+                fN.idInfo[var] = list(fr.idInfo[var])
+        
         return fN
 
     @staticmethod
@@ -194,8 +195,8 @@ class Factor(object):
     @staticmethod
     def inference(fList, queryVars, orderedHiddenVarsList, evidenceList):
         # Restrict by evidence
-        fListN = list()
         for e in evidenceList:
+            fListN = list()
             for factor in fList:
                 if (e in factor.vars):
                     fListN.append(Factor.restrict(factor, e, evidenceList[e]))
@@ -203,7 +204,6 @@ class Factor(object):
                     fListN.append(factor)
             # Update factor list
             fList = fListN
-        fList[1].print_table()
 
         # Elimination
         for hV in orderedHiddenVarsList:
