@@ -144,7 +144,7 @@ class Factor(object):
         for var in varsR:
             idInfoN[var] = fr.idInfo[var]
         # Update new Factor object
-        fN.vars = varsL + list(varS) + varsR
+        fN.vars = varsL + [varS] + varsR
         fN.idInfo = idInfoN
 
         # Reshape fl
@@ -198,12 +198,13 @@ class Factor(object):
         for e in evidenceList:
             for factor in fList:
                 if (e in factor.vars):
-                    fListN.append(Factor.restrict(factor, i, evidenceList[e]))
+                    fListN.append(Factor.restrict(factor, e, evidenceList[e]))
                 else:
                     fListN.append(factor)
             # Update factor list
             fList = fListN
-        
+        fList[1].print_table()
+
         # Elimination
         for hV in orderedHiddenVarsList:
             fListM = list() # list of factors needed to be multiplied
@@ -214,10 +215,13 @@ class Factor(object):
                     fListM.append(factor)
                 else:
                     fListNM.append(factor)
+            
             # Multiply all
             fProduct = reduce(Factor.multiply, fListM)
+            fProduct.print_table()
             # Summout
             fSumout = Factor.sumout(fProduct, hV)
+            fSumout.print_table()
             # Update factor list
             fList = fListNM
             fList.append(fSumout)
