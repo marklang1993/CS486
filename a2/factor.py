@@ -6,6 +6,7 @@ class Factor(object):
     # self.idInfo : dict of vars and vals
     # self.pTable : probability table
 
+    # __init__()
     # vars: list of variables
     # vals: 2d list of values of variables
     # p: 2d list of probability of values
@@ -32,6 +33,7 @@ class Factor(object):
         # Reshape
         self.pTable = self.pTable.reshape(rankTable)
 
+    # print_table_recurse(): print_table() helper function
     def print_table_recurse(self, curTuple):
         # Print probability recursively
         lenCurTuple = len(curTuple)
@@ -50,12 +52,14 @@ class Factor(object):
                 nextTuple = (i, )
                 self.print_table_recurse(curTuple + nextTuple)
 
+    # print_table(): Print current factor in a neat form
     def print_table(self):
         # Use for printing probability
         curTuple = ()
         print(self.vars)
         self.print_table_recurse(curTuple)
 
+    # copy(): Duplicate current factor
     def copy(self):
         fN = Factor([],[],[])
         fN.vars = list(self.vars)
@@ -63,6 +67,7 @@ class Factor(object):
         fN.pTable = self.pTable.copy()
         return fN
 
+    # sort_factor(): Sort variables in this factor
     def sort_factor(self):
        for i in xrange(0, len(self.vars) - 1):
            for j in xrange(0, len(self.vars) - 1 - i):
@@ -73,7 +78,11 @@ class Factor(object):
                    self.vars[i + 1] = tmp
                    # swap axes
                    self.pTable = np.swapaxes(self.pTable, i, i + 1)
-        
+
+    # restrict()
+    # f: Factor object
+    # variable: Restricted variable
+    # value: Variable's value
     @staticmethod
     def restrict(f, variable, value):
         # Create new factor object & copy
@@ -102,9 +111,11 @@ class Factor(object):
             curTuple = (len(vals),)
             rankTable = rankTable + curTuple         
         fN.pTable = fN.pTable.reshape(rankTable)
-
         return fN
 
+    # multiply()
+    # fl: Left Factor object
+    # fr: Right Factor object
     @staticmethod
     def multiply(fl, fr):
         # Sort each factor
@@ -131,9 +142,6 @@ class Factor(object):
         # Check each variable
         flTuple = ()
         frTuple = ()
-        # print unionVars
-        # print fl.vars
-        # print fr.vars
         for var in unionVars:
             if var in fl.vars:
                 flTuple += (len(fl.idInfo[var]), )
@@ -147,10 +155,6 @@ class Factor(object):
         pTableL = fl.pTable.reshape(flTuple)
         pTableR = fr.pTable.reshape(frTuple)
 
-        # print pTableL.shape
-        # print pTableL
-        # print pTableR.shape
-        # print pTableR
         # Create new factor object
         fN = Factor([],[],[])
         fN.pTable = pTableL * pTableR
@@ -161,9 +165,11 @@ class Factor(object):
                 fN.idInfo[var] = list(fl.idInfo[var])
             if var in fr.idInfo:
                 fN.idInfo[var] = list(fr.idInfo[var])
-        
         return fN
 
+    # sumout()
+    # f: Factor object
+    # variable: Summout variable
     @staticmethod
     def sumout(f, variable):
         # Create new factor object & copy
@@ -175,9 +181,10 @@ class Factor(object):
         del fN.idInfo[variable]
         # Update pTable
         fN.pTable = fN.pTable.sum(axis = varIdx)
-
         return fN
-    
+
+    # normalize()
+    # f: Factor object
     @staticmethod
     def normalize(f):
         # Create new factor object & copy
@@ -185,9 +192,9 @@ class Factor(object):
         # Normalize
         sum = fN.pTable.sum()
         fN.pTable = fN.pTable / sum
-
         return fN
     
+    # inference()
     # fList: List of Factor objects
     # queryVars: query Variables
     # orderedHiddenVarsList: List of strings of Variable
@@ -241,7 +248,6 @@ class Factor(object):
         fProduct.print_table()
         print 'Normalize'
         fResult = Factor.normalize(fProduct)
-
         return fResult
 
             

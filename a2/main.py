@@ -200,6 +200,9 @@ def q2d():
     fRes.print_table()
 
 def main():
+    q2b1()
+    q2b2()
+    q2c()
     q2d()
 
 
