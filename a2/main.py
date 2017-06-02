@@ -91,8 +91,8 @@ def q2b1():
     qL = ['Fraud']
     hL = ['Trav']
     eL = dict()
-    f3 = Factor.inference(fL, qL, hL, eL)
-    f3.print_table()
+    fRes = Factor.inference(fL, qL, hL, eL)
+    fRes.print_table()
 
 def q2b2():
     f1 = Factor(['Trav'], \
@@ -119,24 +119,88 @@ def q2b2():
     [['t', 'f']], \
     [0.8, 0.2])
 
-    # hL = ['Trav', 'FP', 'Fraud', 'IP', 'OC', 'CRP']
-
     fL = [f1, f2, f3, f4, f5, f6]
     qL = ['Fraud']
     hL = ['Trav', 'OC']
     eL = dict(FP = 't', IP = 'f', CRP = 't')
-    f3 = Factor.inference(fL, qL, hL, eL)
-    f3.print_table()
+    fRes = Factor.inference(fL, qL, hL, eL)
+    fRes.print_table()
 
-    # fL = [f1, f2, f3, f4]
-    # qL = ['Fraud']
-    # hL = ['Trav', 'OC']
-    # eL = dict(FP = 't', IP = 'f')
-    # f3 = Factor.inference(fL, qL, hL, eL)
-    # f3.print_table()
+def q2c():
+    f1 = Factor(['Trav'], \
+    [['t', 'f']], \
+    [0.05, 0.95])
+
+    f2 = Factor(['Fraud', 'Trav'], \
+    [['t', 'f'], ['t', 'f']], \
+    [0.01, 0.004, 0.99, 0.996])
+
+    f3 = Factor(['FP', 'Fraud', 'Trav'], \
+    [['t', 'f'], ['t', 'f'], ['t', 'f']], \
+    [0.9, 0.1, 0.9, 0.01, 0.1, 0.9, 0.1, 0.99])
+
+    f4 = Factor(['IP', 'Fraud', 'OC'], \
+    [['t', 'f'], ['t', 'f'], ['t', 'f']], \
+    [0.15, 0.051, 0.1, 0.001, 0.85, 0.949, 0.9, 0.999])
+
+    f5 = Factor(['CRP', 'OC'], \
+    [['t', 'f'], ['t', 'f']], \
+    [0.1, 0.01, 0.9, 0.99])
+
+    f6 = Factor(['OC'], \
+    [['t', 'f']], \
+    [0.8, 0.2])
+
+    fL = [f1, f2, f3, f4, f5, f6]
+    qL = ['Fraud']
+    hL = ['OC']
+    eL = dict(FP = 't', IP = 'f', CRP = 't', Trav = 't')
+    fRes = Factor.inference(fL, qL, hL, eL)
+    fRes.print_table()
+
+def q2d():
+    f1 = Factor(['Trav'], \
+    [['t', 'f']], \
+    [0.05, 0.95])
+
+    f2 = Factor(['Fraud', 'Trav'], \
+    [['t', 'f'], ['t', 'f']], \
+    [0.01, 0.004, 0.99, 0.996])
+
+    f3 = Factor(['FP', 'Fraud', 'Trav'], \
+    [['t', 'f'], ['t', 'f'], ['t', 'f']], \
+    [0.9, 0.1, 0.9, 0.01, 0.1, 0.9, 0.1, 0.99])
+
+    f4 = Factor(['IP', 'Fraud', 'OC'], \
+    [['t', 'f'], ['t', 'f'], ['t', 'f']], \
+    [0.15, 0.051, 0.1, 0.001, 0.85, 0.949, 0.9, 0.999])
+
+    f5 = Factor(['CRP', 'OC'], \
+    [['t', 'f'], ['t', 'f']], \
+    [0.1, 0.01, 0.9, 0.99])
+
+    f6 = Factor(['OC'], \
+    [['t', 'f']], \
+    [0.8, 0.2])
+    
+    fL = [f1, f2, f3, f4, f5, f6]
+    qL = ['Fraud']
+    hL = ['Trav', 'FP', 'OC', 'CRP']
+    eL = dict(IP = 't')
+    fRes = Factor.inference(fL, qL, hL, eL)
+    fRes.print_table()
+
+    print('=========================================')
+
+    fL = [f1, f2, f3, f4, f5, f6]
+    qL = ['Fraud']
+    hL = ['Trav', 'FP', 'OC']
+    eL = dict(IP = 't', CRP = 't')
+    fRes = Factor.inference(fL, qL, hL, eL)
+    fRes.print_table()
 
 def main():
-    q2b2()
+    q2d()
 
 
 main()

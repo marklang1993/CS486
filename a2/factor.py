@@ -199,7 +199,11 @@ class Factor(object):
             fListN = list()
             for factor in fList:
                 if (e in factor.vars):
-                    fListN.append(Factor.restrict(factor, e, evidenceList[e]))
+                    fRestrict = Factor.restrict(factor, e, evidenceList[e])
+                    print 'Restrict:',
+                    print e
+                    fRestrict.print_table()
+                    fListN.append(fRestrict)
                 else:
                     fListN.append(factor)
             # Update factor list
@@ -218,9 +222,13 @@ class Factor(object):
             
             # Multiply all
             fProduct = reduce(Factor.multiply, fListM)
+            print 'Multiply:',
+            print hV
             fProduct.print_table()
-            # Summout
+            # Sumout
             fSumout = Factor.sumout(fProduct, hV)
+            print 'Sumout:',
+            print hV
             fSumout.print_table()
             # Update factor list
             fList = fListNM
@@ -229,6 +237,9 @@ class Factor(object):
         # The remaining factors only refer to query variable
         # Take product & normalize
         fProduct = reduce(Factor.multiply, fList)
+        print 'Last Multiply:'
+        fProduct.print_table()
+        print 'Normalize'
         fResult = Factor.normalize(fProduct)
 
         return fResult
