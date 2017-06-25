@@ -1,11 +1,14 @@
 import math
 from articles import Attributes, Article, ArticleCollection
 
+class DTLNode(object):
+    pass
+
 class DTL(object):
     # class variables
     # @ self.zero_val : zero value threshold
     # @ self.att_cnt  : count of all attributes
-    # @ self.art_col  : the collection of all train articles
+    # @ self.art_col  : the collection of all training articles
     def __init__(self):
         # initialize all data
         self.zero_val = 0.00000001
@@ -100,6 +103,18 @@ class DTL(object):
 
         return ig
 
+    # calculate mode classification
+    def mode(self, idx_list):
+        pos_len = 0
+        neg_len = 0
+        for art_idx in idx_list:
+            if True == self.art_col.get_art_cls(art_idx):
+                pos_len += 1
+            else:
+                neg_len += 1
+        print pos_len, neg_len
+        return pos_len >= neg_len
+
 print "Loading..."
 dtl = DTL()
 print dtl.entropy(range(0, 960))
@@ -108,3 +123,7 @@ print "IG:"
 print dtl.ig(range(0, 1060), 0)
 print dtl.ig(range(0, 1060), 1)
 print dtl.ig(range(0, 1060), 20)
+print dtl.mode(range(0, 1060))
+print dtl.mode(range(0, 960))
+print dtl.mode(range(0, 959))
+print dtl.mode(range(1, 959))
