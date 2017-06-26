@@ -7,14 +7,16 @@ from articles import Attributes, Article, ArticleCollection
 
 class DTNode(object):
     # class variables
-    # @ self.pos   : branch of positive value
-    # @ self.neg   : branch of negative value
-    # @ self.cls   : only valid on leaf node
-    # @ self.depth : the depth of this node
+    # @ self.pos      : branch of positive value
+    # @ self.neg      : branch of negative value
+    # @ self.attr_idx : attribute index (only valid on internal node)
+    # @ self.cls      : classification (only valid on leaf node)
+    # @ self.depth    : the depth of this node
     def __init__(self, depth):
         self.pos = None
         self.neg = None
         self.cls = False
+        self.attr_idx = -1
         self.depth = depth
 
 class DTL(object):
@@ -28,7 +30,7 @@ class DTL(object):
         self.zero_val = 0.00000001
         att = Attributes()
         self.att_cnt = att.get_cnt()
-        self.art_col = ArticleCollection(self.att_cnt)
+        self.art_col = ArticleCollection("trainData.txt", "trainLabel.txt", self.att_cnt)
     
     @staticmethod
     def log2(anti_log):
@@ -210,6 +212,8 @@ class DTL(object):
             # best_attr => False
             node.neg = self.learn_recurse(max_depth, new_depth, neg_list, \
                     attr_list, new_default_cls)
+            # add branch label
+            node.attr_idx = best_attr
             return node
 
     # perfrom a DTL
@@ -222,6 +226,47 @@ class DTL(object):
         self.node_cnt = 0
         # start to learn
         self.root = self.learn_recurse(max_depth, 0, idx_list, attr_list, default_cls)
+
+    # test recurse procedure
+    # @ test_art_col : test article collection
+    # @ test_art_idx : test article index
+    # @ dt : decision tree node
+    def test_recurse(self, test_art_col, test_art_idx, dt_node):
+        assert(dt_node != None)
+        if dt_node.pos == None and dt_node.neg == None:
+            # reach a leaf node
+            return dt_node.cls
+        else:
+            # need to determine which node
+            art_attr_val = test_art_col.get_art_attr(test_art_idx, dt_node.attr_idx)
+            print "article: ", test_art_idx, ", attribute index: ", dt_node.attr_idx
+            # go to corresponding node
+            if True == art_attr_val:
+                return self.test_recurse(test_art_col, test_art_idx, dt_node.pos)
+            else:
+                return self.test_recurse(test_art_col, test_art_idx, dt_node.neg)
+
+    # perform a test
+    # @ data_file  : test data file name
+    # @ label_file : test label file name
+    def test(self, data_file, label_file):
+        # read all test data
+        test_art_col = ArticleCollection(data_file, label_file, self.att_cnt)
+        # pre-allocate memory for result
+        result = [False for n in range(test_art_col.get_cnt())]
+        # init. other variables
+        pass_cnt = 0
+        fail_cnt = 0
+        # run test for all
+        for test_art_idx in xrange(0, test_art_col.get_cnt()):
+            test_result = self.test_recurse(test_art_col, test_art_idx, self.root)
+            if test_result == test_art_col.get_art_cls(test_art_idx):
+                pass_cnt += 1
+            else:
+                fail_cnt += 1
+        
+        print "Test result:"
+        print "Pass / Fail : ", pass_cnt, "/", fail_cnt
 
 
 print "Loading..."
@@ -246,5 +291,6 @@ dtl = DTL()
 # print dtl.choose_attr(range(0, 1060), attr_list)
 # print attr_list
 
-dtl.learn(30000000)
-print dtl.root.cls
+dtl.learn(30)
+print "Learning Finish!"
+dtl.test("trainData.txt", "trainLabel.txt")

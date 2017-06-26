@@ -44,12 +44,12 @@ class Article(object):
 
 class ArticleCollection(object):
     # class variables
-    # @ self.attrs : array of all articles
-    def __init__(self, attr_cnt):
+    # @ self.arts : array of all articles
+    def __init__(self, data_file, label_file, attr_cnt):
         # pre-allocate list
-        self.attrs = [Article(attr_cnt) for n in range(1061)]
+        self.arts = [Article(attr_cnt) for n in range(1061)]
         # read data
-        file = open("trainData.txt")
+        file = open(data_file)
         while 1:
             line = file.readline()
             if not line:
@@ -59,11 +59,11 @@ class ArticleCollection(object):
             art_idx = int(tokens[0]) - 1
             attr_idx = int(tokens[1]) - 1
             # set attribute
-            self.attrs[art_idx].set_attr(attr_idx)
+            self.arts[art_idx].set_attr(attr_idx)
         file.close()
 
         # read lable
-        file = open("trainLabel.txt")
+        file = open(label_file)
         art_idx = 0
         while 1:
             line = file.readline()
@@ -72,19 +72,19 @@ class ArticleCollection(object):
             # get classification
             classification = int(line)
             # set attribute
-            self.attrs[art_idx].set_class(classification)
+            self.arts[art_idx].set_class(classification)
             # move to next article
             art_idx += 1
         file.close()
     
-    def get_art_cls(self, idx):
-        return self.attrs[idx].get_class()
+    def get_art_cls(self, art_idx):
+        return self.arts[art_idx].get_class()
 
     def get_art_attr(self, art_idx, attr_idx):
-        return self.attrs[art_idx].get_attr(attr_idx)
+        return self.arts[art_idx].get_attr(attr_idx)
 
     def get_cnt(self):
-        return len(self.attrs)
+        return len(self.arts)
 
 # # Test
 # att = Attributes()
