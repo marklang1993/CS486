@@ -30,7 +30,7 @@ class DTL(object):
         self.zero_val = 0.00000001
         att = Attributes()
         self.att_cnt = att.get_cnt()
-        self.art_col = ArticleCollection("trainData.txt", "trainLabel.txt", self.att_cnt)
+        self.art_col = ArticleCollection(1061, "trainData.txt", "trainLabel.txt", self.att_cnt)
     
     @staticmethod
     def log2(anti_log):
@@ -175,7 +175,7 @@ class DTL(object):
     # @ default_cls : default classification
     def learn_recurse(self, max_depth, cur_depth, idx_list, attr_list, default_cls):
         self.node_cnt += 1
-        print "current node count: ", self.node_cnt, "/", self.att_cnt
+        # print "current node count: ", self.node_cnt, "/", self.att_cnt
         if cur_depth == max_depth:
             # reach max_depth
             node = DTNode(cur_depth)
@@ -204,7 +204,7 @@ class DTL(object):
             # recurse procedure start here
             new_default_cls = self.mode(idx_list)
             new_depth = cur_depth + 1
-            print "current depth: ", cur_depth
+            # print "current depth: ", cur_depth
             node = DTNode(cur_depth)
             # best_attr => True
             node.pos = self.learn_recurse(max_depth, new_depth, pos_list, \
@@ -239,7 +239,7 @@ class DTL(object):
         else:
             # need to determine which node
             art_attr_val = test_art_col.get_art_attr(test_art_idx, dt_node.attr_idx)
-            print "article: ", test_art_idx, ", attribute index: ", dt_node.attr_idx
+            # print "article: ", test_art_idx, ", attribute index: ", dt_node.attr_idx
             # go to corresponding node
             if True == art_attr_val:
                 return self.test_recurse(test_art_col, test_art_idx, dt_node.pos)
@@ -247,11 +247,12 @@ class DTL(object):
                 return self.test_recurse(test_art_col, test_art_idx, dt_node.neg)
 
     # perform a test
+    # @ art_cnt    : count of all articles
     # @ data_file  : test data file name
     # @ label_file : test label file name
-    def test(self, data_file, label_file):
+    def test(self, art_cnt, data_file, label_file):
         # read all test data
-        test_art_col = ArticleCollection(data_file, label_file, self.att_cnt)
+        test_art_col = ArticleCollection(art_cnt, data_file, label_file, self.att_cnt)
         # pre-allocate memory for result
         result = [False for n in range(test_art_col.get_cnt())]
         # init. other variables
@@ -267,6 +268,10 @@ class DTL(object):
         
         print "Test result:"
         print "Pass / Fail : ", pass_cnt, "/", fail_cnt
+        # calculate accuracy
+        tol_cnt = test_art_col.get_cnt()
+        accuracy = float(pass_cnt) / float(tol_cnt) * 100.0
+        print "Accuracy: ", accuracy
 
 
 print "Loading..."
@@ -291,6 +296,12 @@ dtl = DTL()
 # print dtl.choose_attr(range(0, 1060), attr_list)
 # print attr_list
 
-dtl.learn(30)
-print "Learning Finish!"
-dtl.test("trainData.txt", "trainLabel.txt")
+for max_depth in xrange(0, 20):
+    print "Max Depth:", max_depth
+    print "Learning..."
+    dtl.learn(max_depth)
+    # print "Test trainData: "
+    # dtl.test(1061, "trainData.txt", "trainLabel.txt")
+    # print "Test testData: "
+    dtl.test(707, "testData.txt", "testLabel.txt")
+

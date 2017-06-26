@@ -1,0 +1,287 @@
+Loading...
+current node count:  1 / 3566
+current depth:  0
+current node count:  2 / 3566
+current depth:  1
+current node count:  3 / 3566
+current node count:  4 / 3566
+current depth:  2
+current node count:  5 / 3566
+current node count:  6 / 3566
+current depth:  3
+current node count:  7 / 3566
+current depth:  4
+current node count:  8 / 3566
+current node count:  9 / 3566
+current depth:  5
+current node count:  10 / 3566
+current node count:  11 / 3566
+current depth:  6
+current node count:  12 / 3566
+current node count:  13 / 3566
+current depth:  7
+current node count:  14 / 3566
+current node count:  15 / 3566
+current depth:  8
+current node count:  16 / 3566
+current node count:  17 / 3566
+current depth:  9
+current node count:  18 / 3566
+current node count:  19 / 3566
+current depth:  10
+current node count:  20 / 3566
+current node count:  21 / 3566
+current depth:  11
+current node count:  22 / 3566
+current depth:  12
+current node count:  23 / 3566
+current node count:  24 / 3566
+current node count:  25 / 3566
+current depth:  12
+current node count:  26 / 3566
+current node count:  27 / 3566
+current depth:  13
+current node count:  28 / 3566
+current depth:  14
+current node count:  29 / 3566
+current node count:  30 / 3566
+current depth:  15
+current node count:  31 / 3566
+current node count:  32 / 3566
+current node count:  33 / 3566
+current depth:  14
+current node count:  34 / 3566
+current node count:  35 / 3566
+current depth:  15
+current node count:  36 / 3566
+current node count:  37 / 3566
+current depth:  16
+current node count:  38 / 3566
+current node count:  39 / 3566
+current depth:  17
+current node count:  40 / 3566
+current node count:  41 / 3566
+current depth:  18
+current node count:  42 / 3566
+current depth:  19
+current node count:  43 / 3566
+current node count:  44 / 3566
+current node count:  45 / 3566
+current depth:  19
+current node count:  46 / 3566
+current node count:  47 / 3566
+current node count:  48 / 3566
+current depth:  4
+current node count:  49 / 3566
+current node count:  50 / 3566
+current depth:  5
+current node count:  51 / 3566
+current node count:  52 / 3566
+current depth:  6
+current node count:  53 / 3566
+current depth:  7
+current node count:  54 / 3566
+current node count:  55 / 3566
+current node count:  56 / 3566
+current depth:  7
+current node count:  57 / 3566
+current depth:  8
+current node count:  58 / 3566
+current depth:  9
+current node count:  59 / 3566
+current node count:  60 / 3566
+current depth:  10
+current node count:  61 / 3566
+current node count:  62 / 3566
+current node count:  63 / 3566
+current depth:  9
+current node count:  64 / 3566
+current node count:  65 / 3566
+current depth:  10
+current node count:  66 / 3566
+current node count:  67 / 3566
+current depth:  11
+current node count:  68 / 3566
+current node count:  69 / 3566
+current depth:  12
+current node count:  70 / 3566
+current depth:  13
+current node count:  71 / 3566
+current node count:  72 / 3566
+current node count:  73 / 3566
+current depth:  13
+current node count:  74 / 3566
+current node count:  75 / 3566
+current node count:  76 / 3566
+current depth:  8
+current node count:  77 / 3566
+current node count:  78 / 3566
+current depth:  9
+current node count:  79 / 3566
+current node count:  80 / 3566
+current depth:  10
+current node count:  81 / 3566
+current node count:  82 / 3566
+current node count:  83 / 3566
+current depth:  1
+current node count:  84 / 3566
+current depth:  2
+current node count:  85 / 3566
+current node count:  86 / 3566
+current depth:  3
+current node count:  87 / 3566
+current node count:  88 / 3566
+current depth:  4
+current node count:  89 / 3566
+current node count:  90 / 3566
+current depth:  5
+current node count:  91 / 3566
+current node count:  92 / 3566
+current depth:  6
+current node count:  93 / 3566
+current node count:  94 / 3566
+current depth:  7
+current node count:  95 / 3566
+current node count:  96 / 3566
+current depth:  8
+current node count:  97 / 3566
+current node count:  98 / 3566
+current node count:  99 / 3566
+current depth:  2
+current node count:  100 / 3566
+current depth:  3
+current node count:  101 / 3566
+current depth:  4
+current node count:  102 / 3566
+current node count:  103 / 3566
+current node count:  104 / 3566
+current depth:  4
+current node count:  105 / 3566
+current node count:  106 / 3566
+current depth:  5
+current node count:  107 / 3566
+current node count:  108 / 3566
+current depth:  6
+current node count:  109 / 3566
+current node count:  110 / 3566
+current depth:  7
+current node count:  111 / 3566
+current node count:  112 / 3566
+current depth:  8
+current node count:  113 / 3566
+current node count:  114 / 3566
+current depth:  9
+current node count:  115 / 3566
+current depth:  10
+current node count:  116 / 3566
+current node count:  117 / 3566
+current node count:  118 / 3566
+current depth:  10
+current node count:  119 / 3566
+current depth:  11
+current node count:  120 / 3566
+current node count:  121 / 3566
+current node count:  122 / 3566
+current node count:  123 / 3566
+current depth:  3
+current node count:  124 / 3566
+current node count:  125 / 3566
+current depth:  4
+current node count:  126 / 3566
+current node count:  127 / 3566
+current depth:  5
+current node count:  128 / 3566
+current node count:  129 / 3566
+current depth:  6
+current node count:  130 / 3566
+current node count:  131 / 3566
+current depth:  7
+current node count:  132 / 3566
+current depth:  8
+current node count:  133 / 3566
+current node count:  134 / 3566
+current depth:  9
+current node count:  135 / 3566
+current node count:  136 / 3566
+current depth:  10
+current node count:  137 / 3566
+current node count:  138 / 3566
+current depth:  11
+current node count:  139 / 3566
+current node count:  140 / 3566
+current depth:  12
+current node count:  141 / 3566
+current node count:  142 / 3566
+current depth:  13
+current node count:  143 / 3566
+current depth:  14
+current node count:  144 / 3566
+current node count:  145 / 3566
+current node count:  146 / 3566
+current depth:  14
+current node count:  147 / 3566
+current depth:  15
+current node count:  148 / 3566
+current node count:  149 / 3566
+current node count:  150 / 3566
+current depth:  15
+current node count:  151 / 3566
+current node count:  152 / 3566
+current node count:  153 / 3566
+current depth:  8
+current node count:  154 / 3566
+current node count:  155 / 3566
+current depth:  9
+current node count:  156 / 3566
+current node count:  157 / 3566
+current depth:  10
+current node count:  158 / 3566
+current node count:  159 / 3566
+current depth:  11
+current node count:  160 / 3566
+current node count:  161 / 3566
+current depth:  12
+current node count:  162 / 3566
+current depth:  13
+current node count:  163 / 3566
+current node count:  164 / 3566
+current depth:  14
+current node count:  165 / 3566
+current node count:  166 / 3566
+current depth:  15
+current node count:  167 / 3566
+current node count:  168 / 3566
+current node count:  169 / 3566
+current depth:  13
+current node count:  170 / 3566
+current depth:  14
+current node count:  171 / 3566
+current node count:  172 / 3566
+current node count:  173 / 3566
+current depth:  14
+current node count:  174 / 3566
+current node count:  175 / 3566
+current depth:  15
+current node count:  176 / 3566
+current node count:  177 / 3566
+current depth:  16
+current node count:  178 / 3566
+current node count:  179 / 3566
+current depth:  17
+current node count:  180 / 3566
+current node count:  181 / 3566
+current depth:  18
+current node count:  182 / 3566
+current node count:  183 / 3566
+current depth:  19
+current node count:  184 / 3566
+current node count:  185 / 3566
+Learning Finish!
+Test trainData: 
+Test result:
+Pass / Fail :  1061 / 0
+Accuracy:  100.0
+Test testData: 
+Test result:
+Pass / Fail :  563 / 144
+Accuracy:  79.6322489392

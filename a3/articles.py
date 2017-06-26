@@ -45,9 +45,9 @@ class Article(object):
 class ArticleCollection(object):
     # class variables
     # @ self.arts : array of all articles
-    def __init__(self, data_file, label_file, attr_cnt):
+    def __init__(self, art_cnt, data_file, label_file, attr_cnt):
         # pre-allocate list
-        self.arts = [Article(attr_cnt) for n in range(1061)]
+        self.arts = [Article(attr_cnt) for n in range(art_cnt)]
         # read data
         file = open(data_file)
         while 1:
