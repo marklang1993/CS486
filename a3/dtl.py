@@ -296,7 +296,7 @@ dtl = DTL()
 # print dtl.choose_attr(range(0, 1060), attr_list)
 # print attr_list
 
-for max_depth in xrange(0, 20):
+for max_depth in xrange(0, 24):
     print "Max Depth:", max_depth
     print "Learning..."
     dtl.learn(max_depth)

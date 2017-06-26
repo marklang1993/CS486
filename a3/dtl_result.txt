@@ -99,3 +99,23 @@ Learning...
 Test result:
 Pass / Fail :  567 / 140
 Accuracy:  80.198019802
+Max Depth: 20
+Learning...
+Test result:
+Pass / Fail :  564 / 143
+Accuracy:  79.7736916549
+Max Depth: 21
+Learning...
+Test result:
+Pass / Fail :  563 / 144
+Accuracy:  79.6322489392
+Max Depth: 22
+Learning...
+Test result:
+Pass / Fail :  563 / 144
+Accuracy:  79.6322489392
+Max Depth: 23
+Learning...
+Test result:
+Pass / Fail :  563 / 144
+Accuracy:  79.6322489392
