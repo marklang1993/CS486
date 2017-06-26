@@ -104,6 +104,7 @@ class DTL(object):
         return ig
 
     # calculate mode classification
+    # @ idx_list : list of all examples' index
     def mode(self, idx_list):
         pos_len = 0
         neg_len = 0
@@ -114,16 +115,45 @@ class DTL(object):
                 neg_len += 1
         print pos_len, neg_len
         return pos_len >= neg_len
+    
+    # generate an attribute list of all available attribute index
+    def attr_list_gen(self):
+        return range(0, self.att_cnt)
+
+    # choose best attribute based on IG
+    # @ idx_list  : list of all examples' index
+    # @ attr_list : list of all attribute index
+    def choose_attr(self, idx_list, attr_list):
+        # determine the attr_list is empty
+        if len(attr_list) == 0:
+            return -1
+        # init.
+        best_attr_idx = -1  # attribute index
+        best_attr_ig = -1.0 # IG of corresponding attribute (NOTE: larger is better)
+        # calculat best
+        for i in xrange(0, len(attr_list)):
+            attr_idx = attr_list[i]
+            # calculate IG
+            attr_ig = self.ig(idx_list, attr_idx)
+            # determine is this attribute is better?
+            if attr_ig > best_attr_ig:
+                best_attr_ig = attr_ig
+                best_attr_idx = attr_idx
+        return best_attr_idx
+
 
 print "Loading..."
 dtl = DTL()
-print dtl.entropy(range(0, 960))
-print dtl.split(range(0, 1060), 0)
+# print dtl.entropy(range(0, 960))
+# print dtl.split(range(0, 1060), 0)
 print "IG:"
-print dtl.ig(range(0, 1060), 0)
-print dtl.ig(range(0, 1060), 1)
-print dtl.ig(range(0, 1060), 20)
-print dtl.mode(range(0, 1060))
-print dtl.mode(range(0, 960))
-print dtl.mode(range(0, 959))
-print dtl.mode(range(1, 959))
+print 0, dtl.ig(range(0, 1060), 0)
+print 1, dtl.ig(range(0, 1060), 1)
+print 20, dtl.ig(range(0, 1060), 20)
+print 40, dtl.ig(range(0, 1060), 40)
+# print dtl.mode(range(0, 1060))
+# print dtl.mode(range(0, 960))
+# print dtl.mode(range(0, 959))
+# print dtl.mode(range(1, 959))
+print "Choose Attribute:"
+print dtl.choose_attr(range(0, 1060), [0, 1, 20, 40])
