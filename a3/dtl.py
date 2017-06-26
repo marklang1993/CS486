@@ -172,6 +172,8 @@ class DTL(object):
     # @ attr_list   : list of all current attribute index
     # @ default_cls : default classification
     def learn_recurse(self, max_depth, cur_depth, idx_list, attr_list, default_cls):
+        self.node_cnt += 1
+        print "current node count: ", self.node_cnt, "/", self.att_cnt
         if cur_depth == max_depth:
             # reach max_depth
             node = DTNode(cur_depth)
@@ -217,6 +219,7 @@ class DTL(object):
         idx_list = range(0, 1060)
         attr_list = range(0, self.att_cnt)
         default_cls = self.mode(idx_list) # get default cls by mode
+        self.node_cnt = 0
         # start to learn
         self.root = self.learn_recurse(max_depth, 0, idx_list, attr_list, default_cls)
 
@@ -243,5 +246,5 @@ dtl = DTL()
 # print dtl.choose_attr(range(0, 1060), attr_list)
 # print attr_list
 
-dtl.learn(1)
+dtl.learn(30000000)
 print dtl.root.cls
