@@ -114,7 +114,6 @@ class DTL(object):
             nor_epy_neg = float(neg_len)/float(tol_len) * float(epy_neg)
             remainder = nor_epy_pos + nor_epy_neg
             ig = epy_base - remainder
-
         return ig
 
     # calculate mode classification
@@ -127,12 +126,19 @@ class DTL(object):
                 pos_len += 1
             else:
                 neg_len += 1
-        print pos_len, neg_len
         return pos_len >= neg_len
     
-    # generate an attribute list of all available attribute index
-    def attr_list_gen(self):
-        return range(0, self.att_cnt)
+    # determine is the classification same among all examples
+    def is_same_cls(self, idx_list):
+        pos_len = 0
+        neg_len = 0
+        for art_idx in idx_list:
+            if True == self.art_col.get_art_cls(art_idx):
+                pos_len += 1
+            else:
+                neg_len += 1
+        return pos_len == 0 or neg_len == 0
+
 
     # choose best attribute based on IG
     # @ idx_list  : list of all examples' index
@@ -165,10 +171,44 @@ class DTL(object):
     # @ idx_list    : list of all current examples' index
     # @ attr_list   : list of all current attribute index
     # @ default_cls : default classification
-    def learn_recurse(self, cur_depth, idx_list, attr_list, default_cls):
-        if len(idx_list) == 0:
+    def learn_recurse(self, max_depth, cur_depth, idx_list, attr_list, default_cls):
+        if cur_depth == max_depth:
+            # reach max_depth
             node = DTNode(cur_depth)
-            return default_cls
+            node.cls = default_cls
+            return node
+        elif len(idx_list) == 0:
+            # empty example list
+            node = DTNode(cur_depth)
+            node.cls = default_cls
+            return node
+        elif self.is_same_cls(idx_list):
+            # all examples have same classification
+            node = DTNode(cur_depth)
+            node.cls = self.mode(idx_list)
+            return node
+        elif len(attr_list) == 0:
+            # empty attribute list
+            node = DTNode(cur_depth)
+            node.cls = self.mode(idx_list)
+            return node
+        else:
+            # calculate best attribute
+            best_attr = self.choose_attr(idx_list, attr_list)
+            # split
+            (pos_list, neg_list, pos_len, neg_len) = self.split(idx_list, best_attr)
+            # recurse procedure start here
+            new_default_cls = self.mode(idx_list)
+            new_depth = cur_depth + 1
+            print "current depth: ", cur_depth
+            node = DTNode(cur_depth)
+            # best_attr => True
+            node.pos = self.learn_recurse(max_depth, new_depth, pos_list, \
+                    attr_list, new_default_cls)
+            # best_attr => False
+            node.neg = self.learn_recurse(max_depth, new_depth, neg_list, \
+                    attr_list, new_default_cls)
+            return node
 
     # perfrom a DTL
     # @ max_depth : maximum depth of decision tree
@@ -178,25 +218,30 @@ class DTL(object):
         attr_list = range(0, self.att_cnt)
         default_cls = self.mode(idx_list) # get default cls by mode
         # start to learn
-        self.root = self.learn_recurse(0, idx_list, attr_list, default_cls)
+        self.root = self.learn_recurse(max_depth, 0, idx_list, attr_list, default_cls)
 
 
 print "Loading..."
 dtl = DTL()
 # print dtl.entropy(range(0, 960))
 # print dtl.split(range(0, 1060), 0)
-print "IG:"
-print 0, dtl.ig(range(0, 1060), 0)
-print 1, dtl.ig(range(0, 1060), 1)
-print 20, dtl.ig(range(0, 1060), 20)
-print 40, dtl.ig(range(0, 1060), 40)
+
 # print dtl.mode(range(0, 1060))
 # print dtl.mode(range(0, 960))
 # print dtl.mode(range(0, 959))
 # print dtl.mode(range(1, 959))
-print "Choose Attribute:"
-attr_list = [0, 1, 20, 40]
-print attr_list
-print dtl.choose_attr(range(0, 1060), attr_list)
-print attr_list
 
+# print "IG:"
+# print 0, dtl.ig(range(0, 1060), 0)
+# print 1, dtl.ig(range(0, 1060), 1)
+# print 20, dtl.ig(range(0, 1060), 20)
+# print 40, dtl.ig(range(0, 1060), 40)
+
+# print "Choose Attribute:"
+# attr_list = [0, 1, 20, 40]
+# print attr_list
+# print dtl.choose_attr(range(0, 1060), attr_list)
+# print attr_list
+
+dtl.learn(1)
+print dtl.root.cls
