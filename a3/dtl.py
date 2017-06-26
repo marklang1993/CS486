@@ -1,14 +1,28 @@
 import math
 from articles import Attributes, Article, ArticleCollection
 
-class DTLNode(object):
-    pass
+# NOTE: convention for classification
+# class 1 -> negative
+# class 2 -> positive
+
+class DTNode(object):
+    # class variables
+    # @ self.pos   : branch of positive value
+    # @ self.neg   : branch of negative value
+    # @ self.cls   : only valid on leaf node
+    # @ self.depth : the depth of this node
+    def __init__(self, depth):
+        self.pos = None
+        self.neg = None
+        self.cls = False
+        self.depth = depth
 
 class DTL(object):
     # class variables
     # @ self.zero_val : zero value threshold
     # @ self.att_cnt  : count of all attributes
     # @ self.art_col  : the collection of all training articles
+    # @ self.root     : root of decision tree
     def __init__(self):
         # initialize all data
         self.zero_val = 0.00000001
@@ -128,8 +142,9 @@ class DTL(object):
         if len(attr_list) == 0:
             return -1
         # init.
-        best_attr_idx = -1  # attribute index
         best_attr_ig = -1.0 # IG of corresponding attribute (NOTE: larger is better)
+        best_attr_idx = -1  # attribute index
+        best_attr_idx_in_list = -1 # index of attrbute index in attr_list
         # calculat best
         for i in xrange(0, len(attr_list)):
             attr_idx = attr_list[i]
@@ -139,7 +154,31 @@ class DTL(object):
             if attr_ig > best_attr_ig:
                 best_attr_ig = attr_ig
                 best_attr_idx = attr_idx
+                best_attr_idx_in_list = i
+        # remove that attribute
+        del attr_list[best_attr_idx_in_list]
+
         return best_attr_idx
+    
+    # DTL recurse function
+    # @ cur_depth   : current depth of decision tree
+    # @ idx_list    : list of all current examples' index
+    # @ attr_list   : list of all current attribute index
+    # @ default_cls : default classification
+    def learn_recurse(self, cur_depth, idx_list, attr_list, default_cls):
+        if len(idx_list) == 0:
+            node = DTNode(cur_depth)
+            return default_cls
+
+    # perfrom a DTL
+    # @ max_depth : maximum depth of decision tree
+    def learn(self, max_depth):
+        # init.
+        idx_list = range(0, 1060)
+        attr_list = range(0, self.att_cnt)
+        default_cls = self.mode(idx_list) # get default cls by mode
+        # start to learn
+        self.root = self.learn_recurse(0, idx_list, attr_list, default_cls)
 
 
 print "Loading..."
@@ -156,4 +195,8 @@ print 40, dtl.ig(range(0, 1060), 40)
 # print dtl.mode(range(0, 959))
 # print dtl.mode(range(1, 959))
 print "Choose Attribute:"
-print dtl.choose_attr(range(0, 1060), [0, 1, 20, 40])
+attr_list = [0, 1, 20, 40]
+print attr_list
+print dtl.choose_attr(range(0, 1060), attr_list)
+print attr_list
+
