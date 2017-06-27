@@ -15,14 +15,20 @@ class factor(object):
         self.classification = False
         self.p_pos = 0.0
 
+    # set parameter of this factor
+    # @ att_idx        : represented attribute index
+    # @ classification : represented classification
+    # @ p_pos          : possibility of when attribute is True
     def set_param(self, att_idx, classification, p_pos):
         self.att_idx = att_idx
         self.classification = classification
         self.p_pos = p_pos
 
+    # get possibility of when attribute is True
     def get_p_pos(self):
         return self.p_pos
-    
+
+    # get possibility of when attribute is False
     def get_p_neg(self):
         return 1.0 - self.p_pos
 
@@ -36,7 +42,6 @@ class NBM(object):
     # @ self.factors_pos : the list of all factors of classification 2
     # @ self.prior_neg   : prior possibility of classification 1
     # @ self.prior_pos   : prior possibility of classification 2
-
     def __init__(self):
     # initialize all data
         self.attr = Attributes()
@@ -47,6 +52,7 @@ class NBM(object):
         self.prior_neg = -1.0
         self.prior_pos = -1.0
 
+    # train the model by using trainData
     def learn(self):
         # init.
         idx_list = range(0, self.art_col.get_cnt())
@@ -67,6 +73,9 @@ class NBM(object):
             self.factors_pos[i].set_param(i, True, p_pos)
             # print "P -", i, "(neg, pos): ", p_neg, p_pos
     
+    # test an article by using trained model
+    # @ test_art_col : collection of all articles
+    # @ art_idx      : article index
     def test_art(self, test_art_col, art_idx):
         # calculate posterior possibility of classification 1
         sum_neg = math.log(self.prior_neg)
@@ -95,9 +104,13 @@ class NBM(object):
         else:
             return False
     
-    def test(self):
+    # perform a test
+    # @ art_cnt    : count of all articles
+    # @ data_file  : test data file name
+    # @ label_file : test label file name
+    def test(self, art_cnt, data_file, label_file):
         # read all test data
-        test_art_col = ArticleCollection(707, "testData.txt", "testLabel.txt", self.att_cnt)
+        test_art_col = ArticleCollection(art_cnt, data_file, label_file, self.att_cnt)
         # pre-allocate memory for result
         result = [False for n in range(test_art_col.get_cnt())]
         # init. other variables
@@ -118,6 +131,9 @@ class NBM(object):
         accuracy = float(pass_cnt) / float(tol_cnt) * 100.0
         print "Accuracy: ", accuracy
 
+    # calculate the possibility of a True attribute within a list of articles
+    # @ idx_list : list of articles' index
+    # @ attr_idx : attribute index
     def cal_pos_attr(self, idx_list, attr_idx):
         pos_cnt = 0
         for art_idx in idx_list:
@@ -125,6 +141,8 @@ class NBM(object):
                 pos_cnt += 1
         return float(pos_cnt + 1) / float(len(idx_list) + 2)
 
+    # split list of articles into articles of class 2 and class 1
+    # @ idx_list : list of articles' index
     def split_cls(self, idx_list):
         pos_cnt = 0
         neg_cnt = 0
@@ -147,11 +165,39 @@ class NBM(object):
             else:
                 neg_list[neg_pos] = art_idx
                 neg_pos += 1
-        
         return (pos_list, neg_list)
+    
+    # sort index and value based on value
+    def sort_idxval(self, idx, vals):
+       for i in xrange(0, len(vals) - 1):
+           for j in xrange(0, len(vals) - 1 - i):
+               if (vals[j] <= vals[j + 1]):
+                   # swap vals
+                   (vals[j], vals[j + 1]) = (vals[j + 1], vals[j])
+                   # swap index
+                   (idx[j], idx[j + 1]) = (idx[j + 1], idx[j])
 
+    # list top 10 discriminative words
+    def list_top10(self):
+        # pre-allocate memory
+        result_idx = range(0, self.att_cnt)
+        result_val = [-1.0 for n in range(self.att_cnt)]
+        # calculate
+        for attr_idx in result_idx:
+            result_val[attr_idx] = abs(\
+            math.log(self.factors_pos[attr_idx].get_p_pos()) -\
+            math.log(self.factors_neg[attr_idx].get_p_pos()))
+        # sort
+        self.sort_idxval(result_idx, result_val)
+        # print
+        for i in xrange(0, 10):
+            print "No.", i, ":", result_idx[i] + 1, ",", result_val[i], 
+            print ",", self.attr.get_name(result_idx[i]),
 
+# run
 nbm = NBM()
 nbm.learn()
 
-nbm.test()
+nbm.list_top10()
+nbm.test(707, "testData.txt", "testLabel.txt")
+nbm.test(1061, "trainData.txt", "trainLabel.txt")
