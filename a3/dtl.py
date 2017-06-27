@@ -223,7 +223,7 @@ class DTL(object):
     # @ max_depth : maximum depth of decision tree
     def learn(self, max_depth):
         # init.
-        idx_list = range(0, 1060)
+        idx_list = range(0, self.art_col.get_cnt())
         attr_list = range(0, self.att_cnt)
         default_cls = self.mode(idx_list) # get default cls by mode
         self.node_cnt = 0
