@@ -1,18 +1,28 @@
 class Attributes(object):
     # class variables
-    # @ self.cnt : total count of attributes (words)
+    # @ self.cnt       : total count of attributes (words)
+    # @ self.name_list : all attributes
     def __init__(self):
         file = open("words.txt")
         self.cnt = 0
-
+        # count
         while 1:
             line = file.readline()
             if not line:
                 break
             self.cnt += 1
+        file.close()
 
+        # read all attributes
+        file = open("words.txt")
+        self.name_list = [None for n in range(self.cnt)]
+        for i in xrange(0, self.cnt):
+            self.name_list[i] = file.readline()
         file.close()
     
+    def get_name(self, idx):
+        return self.name_list[idx]
+
     def get_cnt(self):
         return self.cnt
 

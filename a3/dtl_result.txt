@@ -7,115 +7,125 @@ Accuracy:  55.0212164074
 Max Depth: 1
 Learning...
 Test result:
-Pass / Fail :  389 / 318
-Accuracy:  55.0212164074
+Pass / Fail :  522 / 185
+Accuracy:  73.8330975955
 Max Depth: 2
 Learning...
 Test result:
-Pass / Fail :  522 / 185
-Accuracy:  73.8330975955
+Pass / Fail :  576 / 131
+Accuracy:  81.4710042433
 Max Depth: 3
 Learning...
 Test result:
-Pass / Fail :  576 / 131
-Accuracy:  81.4710042433
+Pass / Fail :  572 / 135
+Accuracy:  80.9052333805
 Max Depth: 4
 Learning...
 Test result:
-Pass / Fail :  577 / 130
-Accuracy:  81.612446959
+Pass / Fail :  591 / 116
+Accuracy:  83.5926449788
 Max Depth: 5
 Learning...
 Test result:
-Pass / Fail :  559 / 148
-Accuracy:  79.0664780764
+Pass / Fail :  578 / 129
+Accuracy:  81.7538896747
 Max Depth: 6
 Learning...
 Test result:
-Pass / Fail :  555 / 152
-Accuracy:  78.5007072136
+Pass / Fail :  583 / 124
+Accuracy:  82.4611032532
 Max Depth: 7
-Learning...
-Test result:
-Pass / Fail :  576 / 131
-Accuracy:  81.4710042433
-Max Depth: 8
-Learning...
-Test result:
-Pass / Fail :  578 / 129
-Accuracy:  81.7538896747
-Max Depth: 9
-Learning...
-Test result:
-Pass / Fail :  580 / 127
-Accuracy:  82.0367751061
-Max Depth: 10
-Learning...
-Test result:
-Pass / Fail :  573 / 134
-Accuracy:  81.0466760962
-Max Depth: 11
-Learning...
-Test result:
-Pass / Fail :  579 / 128
-Accuracy:  81.8953323904
-Max Depth: 12
-Learning...
-Test result:
-Pass / Fail :  579 / 128
-Accuracy:  81.8953323904
-Max Depth: 13
-Learning...
-Test result:
-Pass / Fail :  571 / 136
-Accuracy:  80.7637906648
-Max Depth: 14
-Learning...
-Test result:
-Pass / Fail :  578 / 129
-Accuracy:  81.7538896747
-Max Depth: 15
-Learning...
-Test result:
-Pass / Fail :  584 / 123
-Accuracy:  82.6025459689
-Max Depth: 16
 Learning...
 Test result:
 Pass / Fail :  582 / 125
 Accuracy:  82.3196605375
-Max Depth: 17
+Max Depth: 8
 Learning...
 Test result:
-Pass / Fail :  579 / 128
-Accuracy:  81.8953323904
-Max Depth: 18
+Pass / Fail :  572 / 135
+Accuracy:  80.9052333805
+Max Depth: 9
+Learning...
+Test result:
+Pass / Fail :  586 / 121
+Accuracy:  82.8854314003
+Max Depth: 10
 Learning...
 Test result:
 Pass / Fail :  577 / 130
 Accuracy:  81.612446959
+Max Depth: 11
+Learning...
+Test result:
+Pass / Fail :  581 / 126
+Accuracy:  82.1782178218
+Max Depth: 12
+Learning...
+Test result:
+Pass / Fail :  578 / 129
+Accuracy:  81.7538896747
+Max Depth: 13
+Learning...
+Test result:
+Pass / Fail :  578 / 129
+Accuracy:  81.7538896747
+Max Depth: 14
+Learning...
+Test result:
+Pass / Fail :  574 / 133
+Accuracy:  81.1881188119
+Max Depth: 15
+Learning...
+Test result:
+Pass / Fail :  578 / 129
+Accuracy:  81.7538896747
+Max Depth: 16
+Learning...
+Test result:
+Pass / Fail :  577 / 130
+Accuracy:  81.612446959
+Max Depth: 17
+Learning...
+Test result:
+Pass / Fail :  577 / 130
+Accuracy:  81.612446959
+Max Depth: 18
+Learning...
+Test result:
+Pass / Fail :  576 / 131
+Accuracy:  81.4710042433
 Max Depth: 19
 Learning...
 Test result:
-Pass / Fail :  567 / 140
-Accuracy:  80.198019802
+Pass / Fail :  571 / 136
+Accuracy:  80.7637906648
 Max Depth: 20
 Learning...
 Test result:
-Pass / Fail :  564 / 143
-Accuracy:  79.7736916549
+Pass / Fail :  570 / 137
+Accuracy:  80.6223479491
 Max Depth: 21
 Learning...
 Test result:
-Pass / Fail :  563 / 144
-Accuracy:  79.6322489392
+Pass / Fail :  570 / 137
+Accuracy:  80.6223479491
 Max Depth: 22
 Learning...
 Test result:
-Pass / Fail :  563 / 144
-Accuracy:  79.6322489392
+Pass / Fail :  570 / 137
+Accuracy:  80.6223479491
 Max Depth: 23
 Learning...
 Test result:
-Pass / Fail :  563 / 144
-Accuracy:  79.6322489392
+Pass / Fail :  570 / 137
+Accuracy:  80.6223479491
+Max Depth: 24
+Learning...
+Test result:
+Pass / Fail :  570 / 137
+Accuracy:  80.6223479491
+Max Depth: 25
+Learning...
+Test result:
+Pass / Fail :  570 / 137
+Accuracy:  80.6223479491

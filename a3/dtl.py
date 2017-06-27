@@ -10,6 +10,7 @@ class DTNode(object):
     # @ self.pos      : branch of positive value
     # @ self.neg      : branch of negative value
     # @ self.attr_idx : attribute index (only valid on internal node)
+    # @ self.ig       : information gain
     # @ self.cls      : classification (only valid on leaf node)
     # @ self.depth    : the depth of this node
     def __init__(self, depth):
@@ -17,25 +18,23 @@ class DTNode(object):
         self.neg = None
         self.cls = False
         self.attr_idx = -1
+        self.ig = -1.0
         self.depth = depth
 
 class DTL(object):
     # class variables
     # @ self.zero_val : zero value threshold
+    # @ self.attr     : attribute collection
     # @ self.att_cnt  : count of all attributes
     # @ self.art_col  : the collection of all training articles
     # @ self.root     : root of decision tree
     def __init__(self):
         # initialize all data
-        self.zero_val = 0.00000001
-        att = Attributes()
-        self.att_cnt = att.get_cnt()
+        self.zero_val = 0.0000000000000001
+        self.attr = Attributes()
+        self.att_cnt = self.attr.get_cnt()
         self.art_col = ArticleCollection(1061, "trainData.txt", "trainLabel.txt", self.att_cnt)
     
-    @staticmethod
-    def log2(anti_log):
-        return math.log(anti_log) / math.log(2.0)
-
     # split list of articles to 2 lists of articles based on an attribute
     # @ idx_list : list of all examples' index
     # @ attr_idx : attribute index
@@ -92,7 +91,8 @@ class DTL(object):
             epy = 0.0
         else:
             # nothing has possibility of 0
-            epy = float(-1) * p_pos * DTL.log2(p_pos) - p_neg * DTL.log2(p_neg)
+            epy = float(-1) * p_pos * math.log(p_pos, 2.0) \
+            - p_neg * math.log(p_neg, 2.0)
 
         return epy
     # calculate information gain based on an attribute
@@ -112,8 +112,8 @@ class DTL(object):
             # calculate remainder
             epy_pos = self.entropy(pos_list)
             epy_neg = self.entropy(neg_list)
-            nor_epy_pos = float(pos_len)/float(tol_len) * float(epy_pos)
-            nor_epy_neg = float(neg_len)/float(tol_len) * float(epy_neg)
+            nor_epy_pos = float(pos_len) / float(tol_len) * float(epy_pos)
+            nor_epy_neg = float(neg_len) / float(tol_len) * float(epy_neg)
             remainder = nor_epy_pos + nor_epy_neg
             ig = epy_base - remainder
         return ig
@@ -166,7 +166,7 @@ class DTL(object):
         # remove that attribute
         del attr_list[best_attr_idx_in_list]
 
-        return best_attr_idx
+        return best_attr_idx, best_attr_ig
     
     # DTL recurse function
     # @ cur_depth   : current depth of decision tree
@@ -179,7 +179,7 @@ class DTL(object):
         if cur_depth == max_depth:
             # reach max_depth
             node = DTNode(cur_depth)
-            node.cls = default_cls
+            node.cls = self.mode(idx_list)
             return node
         elif len(idx_list) == 0:
             # empty example list
@@ -197,8 +197,10 @@ class DTL(object):
             node.cls = self.mode(idx_list)
             return node
         else:
+            # duplicate attr_list
+            dup_attr_list = list(attr_list)
             # calculate best attribute
-            best_attr = self.choose_attr(idx_list, attr_list)
+            (best_attr, best_ig) = self.choose_attr(idx_list, dup_attr_list)
             # split
             (pos_list, neg_list, pos_len, neg_len) = self.split(idx_list, best_attr)
             # recurse procedure start here
@@ -208,12 +210,13 @@ class DTL(object):
             node = DTNode(cur_depth)
             # best_attr => True
             node.pos = self.learn_recurse(max_depth, new_depth, pos_list, \
-                    attr_list, new_default_cls)
+                    dup_attr_list, new_default_cls)
             # best_attr => False
             node.neg = self.learn_recurse(max_depth, new_depth, neg_list, \
-                    attr_list, new_default_cls)
+                    dup_attr_list, new_default_cls)
             # add branch label
             node.attr_idx = best_attr
+            node.ig = best_ig
             return node
 
     # perfrom a DTL
@@ -226,6 +229,32 @@ class DTL(object):
         self.node_cnt = 0
         # start to learn
         self.root = self.learn_recurse(max_depth, 0, idx_list, attr_list, default_cls)
+
+    # print decision recurse procedure
+    def print_tree_recurse(self, dt_node):
+        if dt_node.pos == None and dt_node.neg == None:
+            print "Class",
+            if dt_node.cls == False:
+                print "1"
+            else:
+                print "2"
+        else:
+            print "Label", dt_node.attr_idx + 1, "(", dt_node.ig, ")",
+            print "-", self.attr.get_name(dt_node.attr_idx),
+            # negative branch
+            for n in xrange(0, dt_node.depth):
+                print "  ",
+            print "Absent:",
+            self.print_tree_recurse(dt_node.neg)
+            # positive branch
+            for n in xrange(0, dt_node.depth):
+                print "  ",
+            print "Present:",
+            self.print_tree_recurse(dt_node.pos)
+
+    # print decision tree
+    def print_tree(self):
+        self.print_tree_recurse(self.root)
 
     # test recurse procedure
     # @ test_art_col : test article collection
@@ -296,10 +325,11 @@ dtl = DTL()
 # print dtl.choose_attr(range(0, 1060), attr_list)
 # print attr_list
 
-for max_depth in xrange(0, 24):
+for max_depth in xrange(0, 26):
     print "Max Depth:", max_depth
     print "Learning..."
     dtl.learn(max_depth)
+    # dtl.print_tree()
     # print "Test trainData: "
     # dtl.test(1061, "trainData.txt", "trainLabel.txt")
     # print "Test testData: "
