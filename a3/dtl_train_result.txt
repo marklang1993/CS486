@@ -1,0 +1,157 @@
+Loading...
+Max Depth: 0
+Learning...
+Test trainData: 
+Test result:
+Pass / Fail :  581 / 480
+Accuracy:  54.7596606975
+Max Depth: 1
+Learning...
+Test trainData: 
+Test result:
+Pass / Fail :  815 / 246
+Accuracy:  76.8143261074
+Max Depth: 2
+Learning...
+Test trainData: 
+Test result:
+Pass / Fail :  871 / 190
+Accuracy:  82.0923656927
+Max Depth: 3
+Learning...
+Test trainData: 
+Test result:
+Pass / Fail :  888 / 173
+Accuracy:  83.6946277097
+Max Depth: 4
+Learning...
+Test trainData: 
+Test result:
+Pass / Fail :  909 / 152
+Accuracy:  85.6738925542
+Max Depth: 5
+Learning...
+Test trainData: 
+Test result:
+Pass / Fail :  932 / 129
+Accuracy:  87.8416588124
+Max Depth: 6
+Learning...
+Test trainData: 
+Test result:
+Pass / Fail :  964 / 97
+Accuracy:  90.8576814326
+Max Depth: 7
+Learning...
+Test trainData: 
+Test result:
+Pass / Fail :  978 / 83
+Accuracy:  92.1771913289
+Max Depth: 8
+Learning...
+Test trainData: 
+Test result:
+Pass / Fail :  992 / 69
+Accuracy:  93.4967012253
+Max Depth: 9
+Learning...
+Test trainData: 
+Test result:
+Pass / Fail :  1006 / 55
+Accuracy:  94.8162111216
+Max Depth: 10
+Learning...
+Test trainData: 
+Test result:
+Pass / Fail :  1017 / 44
+Accuracy:  95.8529688973
+Max Depth: 11
+Learning...
+Test trainData: 
+Test result:
+Pass / Fail :  1025 / 36
+Accuracy:  96.6069745523
+Max Depth: 12
+Learning...
+Test trainData: 
+Test result:
+Pass / Fail :  1035 / 26
+Accuracy:  97.5494816211
+Max Depth: 13
+Learning...
+Test trainData: 
+Test result:
+Pass / Fail :  1041 / 20
+Accuracy:  98.1149858624
+Max Depth: 14
+Learning...
+Test trainData: 
+Test result:
+Pass / Fail :  1045 / 16
+Accuracy:  98.4919886899
+Max Depth: 15
+Learning...
+Test trainData: 
+Test result:
+Pass / Fail :  1050 / 11
+Accuracy:  98.9632422243
+Max Depth: 16
+Learning...
+Test trainData: 
+Test result:
+Pass / Fail :  1054 / 7
+Accuracy:  99.3402450518
+Max Depth: 17
+Learning...
+Test trainData: 
+Test result:
+Pass / Fail :  1055 / 6
+Accuracy:  99.4344957587
+Max Depth: 18
+Learning...
+Test trainData: 
+Test result:
+Pass / Fail :  1057 / 4
+Accuracy:  99.6229971725
+Max Depth: 19
+Learning...
+Test trainData: 
+Test result:
+Pass / Fail :  1058 / 3
+Accuracy:  99.7172478794
+Max Depth: 20
+Learning...
+Test trainData: 
+Test result:
+Pass / Fail :  1061 / 0
+Accuracy:  100.0
+Max Depth: 21
+Learning...
+Test trainData: 
+Test result:
+Pass / Fail :  1061 / 0
+Accuracy:  100.0
+Max Depth: 22
+Learning...
+Test trainData: 
+Test result:
+Pass / Fail :  1061 / 0
+Accuracy:  100.0
+Max Depth: 23
+Learning...
+Test trainData: 
+Test result:
+Pass / Fail :  1061 / 0
+Accuracy:  100.0
+Max Depth: 24
+Learning...
+Test trainData: 
+Test result:
+Pass / Fail :  1061 / 0
+Accuracy:  100.0
+Max Depth: 25
+Learning...
+Test trainData: 
+Test result:
+Pass / Fail :  1061 / 0
+Accuracy:  100.0

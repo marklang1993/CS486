@@ -1,0 +1,25 @@
+Label 485 (0.214992437297) - writes
+   False: Label 212 (0.109215568062) - god
+      False: Label 153 (0.0778348840957) - that
+         False: Label 74 (0.0475424422994) - bible
+            False: Class 2 - comp.graphics
+            True: Class 1 - alt.atheism
+         True: Label 188 (0.097186247382) - wrote
+            False: Class 2 - comp.graphics
+            True: Class 1 - alt.atheism
+      True: Label 184 (0.212290066617) - use
+         False: Class 1 - alt.atheism
+         True: Label 1 (1.0) - archive
+            False: Class 2 - comp.graphics
+            True: Class 1 - alt.atheism
+   True: Label 3143 (0.118888826771) - graphics
+      False: Label 2109 (0.085767875642) - image
+         False: Label 153 (0.0864686295328) - that
+            False: Class 1 - alt.atheism
+            True: Class 1 - alt.atheism
+         True: Class 2 - comp.graphics
+      True: Class 2 - comp.graphics
+
+Test result:
+Pass / Fail :  591 / 116
+Accuracy:  83.5926449788
