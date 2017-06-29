@@ -244,12 +244,12 @@ class DTL(object):
             # negative branch
             for n in xrange(0, dt_node.depth):
                 print "  ",
-            print "Absent:",
+            print "False:",
             self.print_tree_recurse(dt_node.neg)
             # positive branch
             for n in xrange(0, dt_node.depth):
                 print "  ",
-            print "Present:",
+            print "True:",
             self.print_tree_recurse(dt_node.pos)
 
     # print decision tree
@@ -325,13 +325,17 @@ dtl = DTL()
 # print dtl.choose_attr(range(0, 1060), attr_list)
 # print attr_list
 
+# 1. Calculate the accuracy under each max_depth
 for max_depth in xrange(0, 26):
     print "Max Depth:", max_depth
     print "Learning..."
     dtl.learn(max_depth)
-    # dtl.print_tree()
-    # print "Test trainData: "
-    # dtl.test(1061, "trainData.txt", "trainLabel.txt")
-    # print "Test testData: "
+    print "Test trainData: "
+    dtl.test(1061, "trainData.txt", "trainLabel.txt")
+    print "Test testData: "
     dtl.test(707, "testData.txt", "testLabel.txt")
 
+# 2. Output tree when maximum accuracy is reached
+dtl.learn(4)
+dtl.print_tree()
+dtl.test(707, "testData.txt", "testLabel.txt")
