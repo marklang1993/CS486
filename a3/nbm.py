@@ -185,8 +185,8 @@ class NBM(object):
         # calculate
         for attr_idx in result_idx:
             result_val[attr_idx] = abs(\
-            math.log(self.factors_pos[attr_idx].get_p_pos()) -\
-            math.log(self.factors_neg[attr_idx].get_p_pos()))
+            math.log(self.factors_pos[attr_idx].get_p_pos(), 2) -\
+            math.log(self.factors_neg[attr_idx].get_p_pos(), 2))
         # sort
         self.sort_idxval(result_idx, result_val)
         # print
