@@ -30,9 +30,8 @@ def calculate(T, R, V, d_factor, cur_state):
     for a_i in xrange(0, 4): # a_i: action taken in the current state
         sum = 0.0
         for s_i in xrange(0, 17): # s_i: next state w.r.t the cur_state
-            if s_i != cur_state: # filter out the current state
-                # calculate the sum
-                sum += T[cur_state, s_i, a_i] * V[s_i]
+            # calculate the sum
+            sum += T[cur_state, s_i, a_i] * V[s_i]
         V_a[a_i] = R[cur_state] + d_factor * sum
     return getMax(V_a)
 
