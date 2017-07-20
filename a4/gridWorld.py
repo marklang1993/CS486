@@ -1,7 +1,7 @@
 import numpy as np
 
 # The function gridWorld returns the transition function T and reward function M
-def gridWorld():
+def gridWorld(a, b):
 
     # Grid world layout:
     #
@@ -51,14 +51,10 @@ def gridWorld():
     # initialize all transition probabilities to 0
     T = np.zeros((17,17,4))
 
-    # For a given action, the agent has probability 0.8 of moving 
-    # by one square in the intended direction and probability 0.1 
+    # For a given action, the agent has probability a of moving 
+    # by one square in the intended direction and probability b
     # of moving sideways.  When the agent bumps into a wall, 
     # it stays in its current location.
-
-    # transition parameters
-    a = 0.8  # intended move
-    b = 0.1  # lateral move
 
     # up (a = 0)
 
