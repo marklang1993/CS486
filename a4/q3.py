@@ -13,7 +13,7 @@ for i_episode in range(1000):
         # get new observation
         new_observation, reward, done, info = env.step(action)
         # save
-        dqn.save(observation, action, reward, new_observation)
+        dqn.save(observation, action, reward, done, new_observation)
         # learn
         if step % dqn.mini_batch_size == 0 :
             dqn.train()
