@@ -1,5 +1,4 @@
 import numpy as np
-import random
 import gridWorld
 
 # action code: 0 - up, 1 - down, 2 - left, 3 - right
@@ -43,7 +42,7 @@ def chooseAction(Q, s):
 def executeAction(T_op, T_ra, epsilon, E, state, action):
     E[state, action] = E[state, action] + 1
     # find next state - roll a 3-face die
-    rand = random.random()
+    rand = np.random.uniform()
     if rand < epsilon:
         # execute random action
         t_space = np.copy(T_ra[state,:,action])

@@ -10,6 +10,7 @@ class DQN(object):
         self.gamma = 0.99
         self.epsilon = 0.05 # epsilon greedy
         self.buffer_size = 1000
+        self.buffer_save_count = 0 # how many times save() is called
         self.update_target_ep_cnt = 2 # update the the target network after every 2 episodes
         self.mini_batch_size = 50
         self.units_cnt = 10 # rectified linear units
@@ -41,7 +42,7 @@ class DQN(object):
             name='next_state_features') # next state features
 
         # 2. Two hidden layers of 10 rectified linear units (fully connected)
-        def build_DNN(c, inputs, units_cnt):
+        def buildDNN(c, inputs, units_cnt):
             val_init = tf.random_normal_initializer(-1.0, 1.0)
             # Layer 1
             with tf.variable_scope('layer1'):
@@ -82,7 +83,7 @@ class DQN(object):
 
         # 3. Build estimate network (for current state)
         with tf.variable_scope('estimate_network'):
-            self.DQN_estimate = build_DNN(
+            self.DQN_estimate = buildDNN(
                 ['DQN_estimate', tf.GraphKeys.GLOBAL_VARIABLES],
                 self.state_features,
                 self.units_cnt
@@ -90,7 +91,7 @@ class DQN(object):
 
         # 4. Build target network (for next state - NOTE: W is fixed)
         with tf.variable_scope('target_network'):
-            self.DQN_target = build_DNN(
+            self.DQN_target = buildDNN(
                 ['DQN_target', tf.GraphKeys.GLOBAL_VARIABLES],
                 self.next_state_features,
                 self.units_cnt
@@ -129,4 +130,48 @@ class DQN(object):
         self.session.run(tf.global_variables_initializer())
         self.costs = []
         
+    # save current data
+    def save(self, ob_state, act_state, reward_state, ob_next_state):
+        self.buffer_save_count += 1
+        # locate buffer slot
+        buffer_index = self.buffer_save_count % self.buffer_size
+        # pack & save
+        state_result = [act_state, reward_state]
+        self.buffer[buffer_index] = np.hstack((ob_state, state_result, ob_next_state))
+
+    def updateBuffer(self):
+        # get all parameters of 2 network
+        DQN_estimate_params = tf.get_collection('DQN_estimate')
+        DQN_target_params = tf.get_collection('DQN_target')
+        # get assign tensors
+        zipped_pairs = zip(DQN_estimate_params, DQN_target_params)
+        assign_tensors = list()
+        for estimate_param, target_param in : zipped_pairs
+             assign_tensors.append(tf.assign(target_param, estimate_param))
+        # update
+        self.session.run(assign_tensors)
+
+    def train(self):
+        # check update
+        if self.episodes_completed % self.update_target_ep_cnt == 0:
+            # update is needed
+            self.updateBuffer()
+            print "Buffer updated at :",self.episodes_completed
+        
+        # sample mini-batch
+        if 
+
+
+    def chooseAction(self, ob_state, env):
+        rand = np.random.uniform()
+        if rand < self.epsilon:
+            # choose random action
+            return env.action_space.sample()
+        else:
+            # choose action by using DQN
+            ob_state = ob_state[np.newaxis] # add 1 dummy dimension
+            return self.session.run(self.Q_estimate,\
+                feed_dict={self.state_features: ob_state})
+
+
 dqn = DQN()
