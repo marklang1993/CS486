@@ -1,5 +1,6 @@
 import numpy as np
 import tensorflow as tf
+import gym
 
 class DQN(object):
     def __init__(self):
@@ -128,7 +129,6 @@ class DQN(object):
         tf.summary.FileWriter("tensorboard/", self.session.graph)
         # Run
         self.session.run(tf.global_variables_initializer())
-        self.costs = []
         
     # save current data
     def save(self, ob_state, act_state, reward_state, ob_next_state):
@@ -146,10 +146,17 @@ class DQN(object):
         # get assign tensors
         zipped_pairs = zip(DQN_estimate_params, DQN_target_params)
         assign_tensors = list()
-        for estimate_param, target_param in : zipped_pairs
+        for estimate_param, target_param in zipped_pairs:
              assign_tensors.append(tf.assign(target_param, estimate_param))
         # update
         self.session.run(assign_tensors)
+
+    @staticmethod
+    def randomSeqGen(total_size, sample_size):
+        random_seq = np.zeros(sample_size, dtype=int)
+        for idx in xrange(0,sample_size):
+            random_seq[idx] = np.random.randint(0, total_size)
+        return random_seq
 
     def train(self):
         # check update
@@ -158,9 +165,33 @@ class DQN(object):
             self.updateBuffer()
             print "Buffer updated at :",self.episodes_completed
         
-        # sample mini-batch
-        if 
+        # sample batch
+        if self.buffer_save_count < self.mini_batch_size:
+            # current saved data count < required count
+            random_seq = DQN.randomSeqGen(self.buffer_save_count, self.mini_batch_size)
+        else:
+            # current saved data count >= required count
+            if self.buffer_save_count < self.buffer_size:
+                # buffer is not full
+                random_seq = DQN.randomSeqGen(self.buffer_save_count, self.mini_batch_size)
+            else:
+                # buffer is full
+                random_seq = DQN.randomSeqGen(self.buffer_size, self.mini_batch_size)
+        # get mini batch
+        mini_batch_memory = np.copy(self.buffer[random_seq,:])
 
+        # feed into DQN and train 
+        self.session.run(\
+            [self.train_operation, self.squared_error],\
+            feed_dict={
+                self.state_features: mini_batch_memory[:, 0:self.n_features],
+                self.state_action: mini_batch_memory[:, self.n_features],
+                self.state_reward: mini_batch_memory[:, self.n_features + 1],
+                self.next_state_features: mini_batch_memory[:, self.n_features + 2:],
+            })
+        
+        # increase step
+        self.episodes_completed = self.episodes_completed + 1
 
     def chooseAction(self, ob_state, env):
         rand = np.random.uniform()
@@ -172,6 +203,3 @@ class DQN(object):
             ob_state = ob_state[np.newaxis] # add 1 dummy dimension
             return self.session.run(self.Q_estimate,\
                 feed_dict={self.state_features: ob_state})
-
-
-dqn = DQN()
