@@ -82,13 +82,13 @@ class DQN_Replay(object):
             next_state_features = np.reshape(mini_batch_memory[idx, self.features_cnt + 3:], [1, self.features_cnt])
 
             if done:
-                target = state_reward
+                Q_val_state = state_reward
             else:
-                target = state_reward + self.gamma *\
+                Q_val_state = state_reward + self.gamma *\
                          np.amax(self.model.predict(next_state_features)[0])
-            target_f = self.model.predict(state_features)
-            target_f[0][state_action] = target
-            self.model.fit(state_features, target_f, epochs=1, verbose=0)
+            Q_val_state_update = self.model.predict(state_features)
+            Q_val_state_update[0][state_action] = Q_val_state
+            self.model.fit(state_features, Q_val_state_update, epochs=1, verbose=0)
 
 
     def chooseAction(self, ob_state):
@@ -160,7 +160,7 @@ class DQN_Replay_Target(object):
         if self.episodes_completed % self.update_target_ep_cnt == 0:
             # update is needed
             self.updateTarget()
-            print "Targer updated at :",self.episodes_completed
+            print "Target updated at :",self.episodes_completed
 
 
     def train(self):
@@ -189,15 +189,14 @@ class DQN_Replay_Target(object):
             state_features = np.reshape(mini_batch_memory[idx, 0:self.features_cnt], [1, self.features_cnt])
             next_state_features = np.reshape(mini_batch_memory[idx, self.features_cnt + 3:], [1, self.features_cnt])
 
-            Q_val_state = self.model.predict(state_features)
+            Q_val_estimate = self.model.predict(state_features) # use model to estimate
             if done:
-                Q_val_state[0][state_action] = state_reward
+                Q_val_estimate[0][state_action] = state_reward
             else:
-                estimate = self.model.predict(next_state_features)[0] # use model to estimate
-                target = self.model_target.predict(next_state_features)[0] # use target model to estimate
-                Q_val_state[0][state_action] = state_reward + self.gamma *\
-                         target[np.argmax(estimate)]
-            self.model.fit(state_features, Q_val_state, epochs=1, verbose=0)
+                Q_val_target = self.model_target.predict(next_state_features)[0] # use target model to estimate
+                Q_val_estimate[0][state_action] = state_reward + self.gamma *\
+                         np.amax(Q_val_target)
+            self.model.fit(state_features, Q_val_estimate, epochs=1, verbose=0)
 
 
     def chooseAction(self, ob_state):
