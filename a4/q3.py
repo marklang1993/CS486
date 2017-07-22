@@ -1,5 +1,4 @@
 import gym
-from gym import spaces
 import numpy as np
 import math
 import matplotlib.pyplot as plt
@@ -7,10 +6,14 @@ import matplotlib.pyplot as plt
 import DQN
 
 env = gym.make('CartPole-v0')
+# dqn = DQN.DQN()
+# dqn = DQN.DQN_Target()
 dqn = DQN.DQN_Replay()
-discount_reward = np.zeros(1000)
-for i_episode in range(10):
+# dqn = DQN.DQN_Replay_Target()
+discount_rewards = np.zeros(1000)
+for i_episode in range(1000):
     observation = env.reset()
+    discount_reward = 0.0
     for step in range(500):
         #env.render()
         # take an action
@@ -28,16 +31,17 @@ for i_episode in range(10):
             print("Episode finished after {} timesteps".format(step+1))
             break
 
-    # calculate discounted reward
-    if i_episode == 0:
-        discount_reward[i_episode] = reward * math.pow(dqn.gamma, i_episode)
-    else:
-        discount_reward[i_episode] = reward * math.pow(dqn.gamma, i_episode) + discount_reward[i_episode - 1]
+        # calculate discounted reward
+        discount_reward += reward * math.pow(dqn.gamma, step)
+
+    # record
+    discount_rewards[i_episode] = discount_reward
     # notify
     dqn.episode_complete()
     
 # plot
-plt.plot(np.arange(discount_reward.size), discount_reward)
+plt.plot(np.arange(discount_rewards.size), discount_rewards)
 plt.ylabel('Discounted Reward')
 plt.xlabel('Episodes')
 plt.show()
+print discount_rewards
