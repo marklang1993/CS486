@@ -56,6 +56,12 @@ def start(a, b):
 
     print "a = ", a, "; b = ", b
     print(V)
+
+    for idx in xrange(0, V.size):
+        print "|", V[idx], "|",
+        if (idx + 1) % 4 == 0:
+            print " " # Change a line
+
     for idx in xrange(0, A.size):
         if A[idx] == 0:
             print "|  UP   |",
@@ -76,10 +82,4 @@ start(a, b)
 # Transition parameters
 a = 0.9  # intended move
 b = 0.05  # lateral move
-start(a, b)
-
-# For reference:
-# Transition parameters
-a = 1  # intended move
-b = 0  # lateral move
 start(a, b)
