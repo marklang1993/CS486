@@ -1,4 +1,5 @@
 import numpy as np
+import random
 from keras.models import Sequential
 from keras.layers import Dense
 from keras.optimizers import Adam
@@ -56,21 +57,11 @@ class DQN_Replay(object):
 
 
     def train(self):
-        # sample batch
         if self.buffer_save_count < self.mini_batch_size:
-            # current saved data count < required count
-            random_seq = DQN.randomSeqGen(self.buffer_save_count, self.mini_batch_size)
+            mini_batch_memory = random.sample(self.buffer, self.buffer_save_count)
         else:
-            # current saved data count >= required count
-            if self.buffer_save_count < self.buffer_size:
-                # buffer is not full
-                random_seq = DQN.randomSeqGen(self.buffer_save_count, self.mini_batch_size)
-            else:
-                # buffer is full
-                random_seq = DQN.randomSeqGen(self.buffer_size, self.mini_batch_size)
-        # get mini batch
-        mini_batch_memory = np.copy(self.buffer[random_seq,:])
-
+            mini_batch_memory = random.sample(self.buffer, self.mini_batch_size)
+            
         # train the model
         for idx in xrange(0, mini_batch_memory[:,0].size):
             # state_features(4), state_action, state_reward, done, next_state_features(4)
@@ -81,14 +72,15 @@ class DQN_Replay(object):
             state_features = np.reshape(mini_batch_memory[idx, 0:self.features_cnt], [1, self.features_cnt])
             next_state_features = np.reshape(mini_batch_memory[idx, self.features_cnt + 3:], [1, self.features_cnt])
 
+            current_state_Q_val = self.model.predict(state_features)
+            next_state_Q_val = self.model.predict(next_state_features)
             if done:
-                Q_val_state = state_reward
+                Q_val = state_reward
             else:
-                Q_val_state = state_reward + self.gamma *\
-                         np.amax(self.model.predict(next_state_features)[0])
-            Q_val_state_update = self.model.predict(state_features)
-            Q_val_state_update[0][state_action] = Q_val_state
-            self.model.fit(state_features, Q_val_state_update, epochs=1, verbose=0)
+                Q_val = state_reward + self.gamma *\
+                         np.amax(next_state_Q_val[0])
+            current_state_Q_val[0][state_action] = Q_val
+            self.model.fit(state_features, current_state_Q_val, epochs=1, verbose=0)
 
 
     def chooseAction(self, ob_state):
